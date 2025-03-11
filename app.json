@@ -1,0 +1,22 @@
+{
+    "name": "Mastertech-md  Pairing",
+    "description": "MASTERTECH-MD WA bot, Created by Techlord",
+    "logo": "https://files.catbox.moe/fq30m0.jpg",
+    "repository": "https://github.com/mastertech-md/elite.pair",
+    "keywords": ["Mastertech-md"],
+    "success_url": "/", 
+    "buildpacks": [{ "url": "https://github.com/heroku/heroku-buildpack-nodejs#latest" } ],
+    "env": {      
+      "PORT": {
+        "description": "Port for web app.4000,5000,3000... any!",
+        "value": "5000",
+        "required": false 
+      },
+      "MESSAGE": {
+        "description": "set session id conformation message",
+        "value": "",
+        "required": false 
+      }
+    }   
+
+}

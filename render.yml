@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: mastertech-md
+    env: node
+    buildCommand: npm install
+    startCommand: node mastertech.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: PASTEBIN_API_KEY
+        value: 1DnoOkf5Grx4euI_JnQjpVxDoUE79bep
+      - key: SESSION_NAME
+        value: mastertech-md
+    plan: free
+    autoDeploy: true
