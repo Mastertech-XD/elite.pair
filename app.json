@@ -2,7 +2,7 @@
     "name": "Mastertech-md  Pairing",
     "description": "MASTERTECH-MD WA bot, Created by Techlord",
     "logo": "https://files.catbox.moe/fq30m0.jpg",
-    "repository": "https://github.com/mastertech-md/elite.pair",
+    "repository": "https://github.com/Mastertech-XD/elite.pair",
     "keywords": ["Mastertech-md"],
     "success_url": "/", 
     "buildpacks": [{ "url": "https://github.com/heroku/heroku-buildpack-nodejs#latest" } ],
