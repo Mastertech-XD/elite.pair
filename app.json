@@ -1,22 +1,53 @@
 {
-    "name": "Mastertech-md  Pairing",
-    "description": "MASTERTECH-MD WA bot, Created by Techlord",
-    "logo": "https://files.catbox.moe/fq30m0.jpg",
-    "repository": "https://github.com/Mastertech-XD/elite.pair",
-    "keywords": ["Mastertech-md"],
-    "success_url": "/", 
-    "buildpacks": [{ "url": "https://github.com/heroku/heroku-buildpack-nodejs#latest" } ],
-    "env": {      
-      "PORT": {
-        "description": "Port for web app.4000,5000,3000... any!",
-        "value": "5000",
-        "required": false 
-      },
-      "MESSAGE": {
-        "description": "set session id conformation message",
-        "value": "",
-        "required": false 
-      }
-    }   
-
+  "name": "Mastertech-MD Pairing System",
+  "description": "WhatsApp Bot Pairing Service | Created by Masterpeace",
+  "logo": "https://files.catbox.moe/fq30m0.jpg",
+  "repository": "https://github.com/Mastertech-XD/elite.pair",
+  "keywords": [
+    "whatsapp-bot",
+    "mastertech-md",
+    "automation"
+  ],
+  "success_url": "/",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "PORT": {
+      "description": "Port for the web application (e.g., 3000, 4000, 5000)",
+      "value": "5000",
+      "required": false
+    },
+    "SESSION_SECRET": {
+      "description": "Secret key for session encryption",
+      "required": true
+    },
+    "API_KEY": {
+      "description": "Optional API key for secure endpoint access",
+      "required": false
+    },
+    "WHATSAPP_API_URL": {
+      "description": "Endpoint for WhatsApp pairing API",
+      "value": "https://api.whatsapp.com/send",
+      "required": false
+    },
+    "RATE_LIMIT": {
+      "description": "Requests per minute (recommended: 10-30)",
+      "value": "15",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-redis:hobby-dev"
+    }
+  ]
 }
