@@ -1,7 +1,7 @@
 const QRCode = require('qrcode');
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 const pino = require("pino");
 const { makeid } = require('./id');
 const {
@@ -14,44 +14,62 @@ const {
 
 const router = express.Router();
 
-function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
+async function removeFile(filePath) {
+    try {
+        await fs.access(filePath);
+        await fs.rm(filePath, { recursive: true, force: true });
+    } catch (err) {
+        // File doesn't exist or already removed
+    }
 }
 
 router.get('/', async (req, res) => {
     const id = makeid();
+    const tempDir = path.join(__dirname, 'temp', id);
 
-    async function GENERATE_QR_SESSION() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+    try {
+        await fs.mkdir(tempDir, { recursive: true });
 
-        try {
-            let botInstance = MasterpeaceEliteBot({
-                auth: state,
-                printQRInTerminal: false,
-                logger: pino({ level: "silent" }),
-                browser: Browsers.macOS("Desktop"),
-            });
+        const { state, saveCreds } = await useMultiFileAuthState(tempDir);
 
-            botInstance.ev.on('creds.update', saveCreds);
-            botInstance.ev.on("connection.update", async (s) => {
-                const { connection, lastDisconnect, qr } = s;
+        let botInstance = MasterpeaceEliteBot({
+            auth: state,
+            printQRInTerminal: false,
+            logger: pino({ level: "silent" }),
+            browser: Browsers.macOS("Desktop"),
+        });
 
-                if (qr) {
+        botInstance.ev.on('creds.update', saveCreds);
+        
+        botInstance.ev.on("connection.update", async (s) => {
+            const { connection, lastDisconnect, qr } = s;
+
+            if (qr) {
+                try {
                     const qrImage = await QRCode.toBuffer(qr);
-res.setHeader('Content-Type', 'image/png');
-res.send(qrImage);
+                    res.setHeader('Content-Type', 'image/png');
+                    res.send(qrImage);
+                } catch (err) {
+                    console.error('QR generation error:', err);
+                    if (!res.headersSent) {
+                        res.status(500).json({ error: 'QR generation failed' });
+                    }
                 }
+            }
 
-                if (connection == "open") {
+            if (connection === "open") {
+                try {
                     await delay(5000);
-                    let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                    await delay(800);
-                    let b64data = Buffer.from(data).toString('base64');
+                    const credsPath = path.join(tempDir, 'creds.json');
+                    const data = await fs.readFile(credsPath);
+                    const b64data = Buffer.from(data).toString('base64');
 
-                    let session = await botInstance.sendMessage(botInstance.user.id, { text: 'MASTERPEACE-SESSION;;;' + b64data });
+                    const session = await botInstance.sendMessage(
+                        botInstance.user.id, 
+                        { text: 'MASTERPEACE-SESSION;;;' + b64data }
+                    );
 
-                    let sessionMessage = `
+                    const sessionMessage = `
 *Session Connected ✅*
 Enjoy 😺
 By _Masterpeace Elite_
@@ -66,31 +84,44 @@ ______________________________
 ❍ *GitHub:* [Mastertech-MD Repository](https://mastertech-md/Mastertech)
 ❍ *WhatsApp Channel:* [Click Here](https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D)
 ❍ *Owner:* [Contact Me](https://wa.me/254743727510)
+                    `;
 
-📢 Don't forget to give a ⭐ to my repo!
-`;
+                    await botInstance.sendMessage(
+                        botInstance.user.id, 
+                        { text: sessionMessage }, 
+                        { quoted: session }
+                    );
 
-                    await botInstance.sendMessage(botInstance.user.id, { text: sessionMessage }, { quoted: session });
-
-                    await delay(100);
                     await botInstance.ws.close();
-                    removeFile("temp/" + id);
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10000);
-                    GENERATE_QR_SESSION();
+                } catch (err) {
+                    console.error('Session transfer error:', err);
+                } finally {
+                    await removeFile(tempDir);
                 }
-            });
-
-        } catch (err) {
-            if (!res.headersSent) {
-                await res.json({ code: "Service Unavailable" });
+            } else if (connection === "close" && lastDisconnect?.error?.output?.statusCode !== 401) {
+                await delay(10000);
+                botInstance = null;
+                await removeFile(tempDir);
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Connection closed unexpectedly' });
+                }
             }
-            console.log(err);
-            removeFile("temp/" + id);
+        });
+
+        req.on('close', async () => {
+            if (botInstance && botInstance.ws) {
+                await botInstance.ws.close();
+            }
+            await removeFile(tempDir);
+        });
+
+    } catch (err) {
+        console.error('QR session error:', err);
+        await removeFile(tempDir);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Session initialization failed' });
         }
     }
-
-    return await GENERATE_QR_SESSION();
 });
 
 module.exports = router;
