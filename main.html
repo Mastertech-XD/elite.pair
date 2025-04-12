@@ -4,33 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MASTERTECH-MD WhatsApp Bot</title>
-  <!-- Enhanced Meta Tags -->
-  <meta name="theme-color" content="#f0a500">
-  <meta name="description" content="Secure pairing portal for MASTERTECH-MD WhatsApp bot">
-  <meta name="author" content="Masterpeace Elite">
-  <meta name="robots" content="noindex, nofollow"> <!-- Disabled indexing for security -->
-  <meta property="og:title" content="MASTERTECH-MD WhatsApp Bot"/>
-  <meta property="og:description" content="Official pairing interface for MASTERTECH-MD bot"/>
-  <meta property="og:image" content="/assets/images/secure-banner.jpg">
-  <meta property="og:url" content="https://yourdomain.com">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; media-src https://files.catbox.moe">
-
-  <!-- Preload Critical Resources -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Fira+Code&display=swap" as="style">
-  <link rel="preload" href="/assets/css/main.css" as="style">
-  <link rel="preload" href="/assets/images/bg.jpg" as="image">
-
-  <!-- Favicon with multiple sizes -->
-  <link rel="icon" type="image/jpg" sizes="32x32" href="/assets/favicons/favicon-32x32.jpg">
-  <link rel="icon" type="image/jpg" sizes="16x16" href="/assets/favicons/favicon-16x16.jpg">
-  <link rel="apple-touch-icon" href="/assets/favicons/apple-touch-icon.jpg">
-
-  <!-- CSS with fallback -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Fira+Code&display=swap">
-  <link rel="stylesheet" href="/assets/css/main.css">
-  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: files.catbox.moe; style-src 'self' 'unsafe-inline'; font-src 'self'">
   <style>
-    /* Critical CSS (above-the-fold) */
     :root {
       --primary: #ff6347;
       --secondary: #87ceeb;
@@ -45,8 +20,7 @@
       align-items: center;
       background: var(--bg-dark) url("https://files.catbox.moe/fq30m0.jpg") no-repeat center/cover fixed;
       color: #f0f0f0;
-      font-family: 'Fira Code', monospace, sans-serif;
-      position: relative;
+      font-family: Arial, sans-serif;
     }
     
     body::before {
@@ -67,119 +41,101 @@
     }
     
     h1 {
-      font-family: 'New Rocker', cursive;
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-size: 2.5rem;
       color: var(--primary);
       margin: 0;
       text-shadow: 2px 2px 3px rgba(0,0,0,0.8);
     }
     
-    /* Non-critical CSS will be loaded asynchronously */
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 0 20px;
+    }
+    
+    .card {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 25px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+    }
+    
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    footer {
+      margin-top: auto;
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+    }
   </style>
-  
-  <!-- Deferred non-critical CSS -->
-  <link rel="stylesheet" href="/assets/css/non-critical.css" media="print" onload="this.media='all'">
 </head>
-
 <body>
   <header>
-    <h1 id="titre">MASTERTECH-MD</h1>
+    <h1>MASTERTECH-MD</h1>
     <h2>Secure WhatsApp Bot Pairing</h2>
   </header>
 
   <main class="container">
-    <!-- Pairing Section -->
-    <section class="pairing-section">
-      <div class="card">
-        <h3>Authentication Methods</h3>
+    <div class="card">
+      <h3>Authentication Methods</h3>
+      
+      <div class="btn-group">
+        <a href="/pair" class="btn btn-primary">
+          Generate Pair Code
+        </a>
         
-        <div class="btn-group">
-          <a href="/pair" class="btn btn-primary" id="pairBtn">
-            <i class="icon-lock"></i> Generate Pair Code
-          </a>
-          
-          <a href="/qr" class="btn btn-secondary" id="qrBtn">
-            <i class="icon-qrcode"></i> QR Code Pairing
-          </a>
-        </div>
-        
-        <div class="security-notice">
-          <i class="icon-shield"></i>
-          <p>All pairing sessions are encrypted and timeout after 5 minutes</p>
-        </div>
+        <a href="/api/qr" class="btn btn-secondary">
+          QR Code Pairing
+        </a>
       </div>
-    </section>
-
-    <!-- Status Indicator -->
-    <div class="status-indicator hidden" id="statusIndicator">
-      <div class="spinner"></div>
-      <span>Securing connection...</span>
+      
+      <div class="security-notice">
+        <p>All sessions are encrypted and automatically cleared after use</p>
+      </div>
     </div>
   </main>
 
-  <!-- Audio Player (Lazy Loaded) -->
-  <div class="audio-container" id="audioContainer" loading="lazy">
-    <button class="audio-toggle" aria-label="Toggle audio controls">
-      <i class="icon-music"></i>
-    </button>
-    <audio controls class="hidden">
-      <source src="https://files.catbox.moe/utbujd.mp3" type="audio/mp3">
-      Your browser does not support the audio element.
-    </audio>
-  </div>
-
-  <!-- Secure Footer -->
-  <footer class="secure-footer">
-    <div class="footer-content">
-      <p>&copy; <span id="year"></span> MASTERTECH-MD | Security Verified</p>
-      <div class="footer-links">
-        <a href="/privacy" class="footer-link">Privacy Policy</a>
-        <a href="/terms" class="footer-link">Terms of Service</a>
-        <a href="https://github.com/mastertech-md" class="footer-link" rel="noopener noreferrer">
-          <i class="icon-github"></i> GitHub
-        </a>
-      </div>
-    </div>
+  <footer>
+    <p>&copy; <span id="year"></span> MASTERTECH-MD | Security Verified</p>
   </footer>
 
-  <!-- Secure Scripts -->
   <script>
     // Set current year
     document.getElementById('year').textContent = new Date().getFullYear();
     
-    // Enhanced security event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-      // Secure button handlers
-      document.getElementById('pairBtn').addEventListener('click', function(e) {
-        document.getElementById('statusIndicator').classList.remove('hidden');
-        // Add session validation here
-      });
-      
-      // Audio lazy loading
-      const audioContainer = document.getElementById('audioContainer');
-      audioContainer.addEventListener('click', function() {
-        const audio = this.querySelector('audio');
-        audio.classList.toggle('hidden');
-        if (!audio.src) {
-          audio.load(); // Only load when activated
-        }
-      });
-      
-      // Session timeout warning
-      setTimeout(() => {
-        console.log('Session security check');
-      }, 300000); // 5 minute check
-    });
-    
-    // CSP-compliant external redirect
-    function safeRedirect(url) {
-      if (url.startsWith('https://')) {
-        window.location.href = url;
-      }
+    // Secure session handling
+    if (window.location.search.includes('session=')) {
+      history.replaceState(null, '', window.location.pathname);
     }
   </script>
-  
-  <!-- Load non-critical JS -->
-  <script src="/assets/js/analytics.js" defer></script>
 </body>
 </html>
