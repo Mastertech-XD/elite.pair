@@ -1,7 +1,5 @@
-const PastebinAPI = require('pastebin-js');
-const { makeid } = require('./id');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs').promises;
 const crypto = require('crypto');
 const pino = require('pino');
 const {
@@ -9,9 +7,8 @@ const {
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
-} = require('maher-zubair-baileys');
+} = require('@whiskeysockets/baileys');
 
-// Restored all original audio URLs exactly
 const audioUrls = [
     "https://files.catbox.moe/hpwsi2.mp3",
     "https://files.catbox.moe/xci982.mp3",
@@ -25,129 +22,116 @@ const audioUrls = [
     "https://files.catbox.moe/26oeeh.mp3"
 ];
 
-// Restored original padding function
 function generateRandomString(length) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const bytes = crypto.randomBytes(length);
     let result = '';
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    for (let i = 0; i < bytes.length; i++) {
+        result += chars[bytes[i] % chars.length];
     }
     return result;
 }
 
-// Enhanced file removal with logging
-function removeFile(filePath) {
+async function removeFile(filePath) {
     try {
-        if (fs.existsSync(filePath)) {
-            fs.rmSync(filePath, { recursive: true, force: true });
-            console.log(`[CLEANUP] Removed ${filePath}`);
-        }
+        await fs.access(filePath);
+        await fs.rm(filePath, { recursive: true, force: true });
     } catch (err) {
-        console.error(`[ERROR] Cleanup failed: ${err.message}`);
+        // File doesn't exist or already removed
     }
 }
 
-// Restored original routing with security additions
 module.exports = async (req, res) => {
-    const id = makeid();
+    const id = req.id || crypto.randomBytes(16).toString('hex');
     let num = req.query.number;
 
-    // Security: Validate phone number format
-    if (!/^[\d+]{10,15}$/.test(num)) {
+    if (!num || !/^\+?[\d]{10,15}$/.test(num)) {
         return res.status(400).json({ error: 'Invalid phone number format' });
     }
 
-    async function MASTERTECH_MD_PAIR_CODE() {
-        const tempDir = path.join('./temp', id);
+    num = num.replace(/[^0-9]/g, '');
+    const tempDir = path.join(__dirname, 'temp', id);
+
+    try {
+        await fs.mkdir(tempDir, { recursive: true });
+
         const { state, saveCreds } = await useMultiFileAuthState(tempDir);
 
-        try {
-            const Pair_Code_By_Masterpeace_Elite = MasterpeaceEliteBot({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }))
-                },
-                printQRInTerminal: false,
-                logger: pino({ level: 'fatal' }),
-                browser: ['Chrome (Linux)', '', '']
-            });
+        const botInstance = MasterpeaceEliteBot({
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }))
+            },
+            printQRInTerminal: false,
+            logger: pino({ level: 'fatal' }),
+            browser: ['Chrome (Linux)', '', '']
+        });
 
-            if (!Pair_Code_By_Masterpeace_Elite.authState.creds.registered) {
-                await delay(1500);
-                num = num.replace(/[^0-9]/g, '');
-                const code = await Pair_Code_By_Masterpeace_Elite.requestPairingCode(num);
+        if (!botInstance.authState.creds.registered) {
+            await delay(1500);
+            const code = await botInstance.requestPairingCode(num);
+            
+            res.json({ code });
 
-                if (!res.headersSent) {
-                    res.json({ code });
-                }
-
-                Pair_Code_By_Masterpeace_Elite.ev.on('creds.update', saveCreds);
-                Pair_Code_By_Masterpeace_Elite.ev.on('connection.update', async (s) => {
-                    const { connection, lastDisconnect } = s;
-                    
-                    if (connection === 'open') {
+            botInstance.ev.on('creds.update', saveCreds);
+            
+            botInstance.ev.on('connection.update', async (update) => {
+                const { connection, lastDisconnect } = update;
+                
+                if (connection === 'open') {
+                    try {
                         await delay(5000);
                         const credsPath = path.join(tempDir, 'creds.json');
-                        
-                        // Original encoding logic preserved
-                        const data = fs.readFileSync(credsPath);
-                        let b64data = Buffer.from(data).toString('base64');
-                        let finalSessionCode = `${b64data}${generateRandomString(530 - b64data.length)}`;
+                        const data = await fs.readFile(credsPath);
+                        const b64data = Buffer.from(data).toString('base64');
+                        const finalSessionCode = `${b64data}${generateRandomString(530 - b64data.length)}`;
 
-                        // Restored original messaging flow
-                        const session = await Pair_Code_By_Masterpeace_Elite.sendMessage(
-                            Pair_Code_By_Masterpeace_Elite.user.id, 
+                        const session = await botInstance.sendMessage(
+                            botInstance.user.id, 
                             { text: finalSessionCode }
                         );
 
-                        // Restored exact confirmation message
                         const confirmationMessage = `✅ *Session Successfully Linked!*\n\n🔑 *Session Code:* \`${finalSessionCode}\`\n\n📞 *Contact:* +254743727510\n🌐 *GitHub:* [Mastertech-MD](https://github.com/mastertech-md)`;
-                        await Pair_Code_By_Masterpeace_Elite.sendMessage(
-                            Pair_Code_By_Masterpeace_Elite.user.id, 
+                        
+                        await botInstance.sendMessage(
+                            botInstance.user.id, 
                             { text: confirmationMessage },
                             { quoted: session }
                         );
 
-                        // Restored random audio sending
                         const randomAudio = audioUrls[Math.floor(Math.random() * audioUrls.length)];
-                        await Pair_Code_By_Masterpeace_Elite.sendMessage(
-                            Pair_Code_By_Masterpeace_Elite.user.id,
+                        await botInstance.sendMessage(
+                            botInstance.user.id,
                             {
                                 audio: { url: randomAudio },
                                 mimetype: randomAudio.endsWith('.m4a') ? 'audio/mp4' : 'audio/mpeg',
-                                ptt: true,
-                                contextInfo: {
-                                    externalAdReply: {
-                                        title: 'MASTERTECH-MD',
-                                        body: 'Your session is ready!',
-                                        thumbnailUrl: 'https://files.catbox.moe/v38p4r.jpeg',
-                                        sourceUrl: 'https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D'
-                                    }
-                                }
+                                ptt: true
                             },
                             { quoted: session }
                         );
 
-                        await Pair_Code_By_Masterpeace_Elite.ws.close();
-                        removeFile(tempDir);
+                    } catch (err) {
+                        console.error('Session transfer error:', err);
+                    } finally {
+                        await botInstance.ws.close();
+                        await removeFile(tempDir);
                     }
-                });
-            }
-        } catch (err) {
-            console.error('[SESSION ERROR]', err);
-            removeFile(tempDir);
-            if (!res.headersSent) {
-                res.status(500).json({ code: 'Service Unavailable' });
-            }
+                } else if (connection === 'close' && lastDisconnect?.error) {
+                    await botInstance.ws.close();
+                    await removeFile(tempDir);
+                }
+            });
+
+            req.on('close', async () => {
+                await botInstance.ws.close();
+                await removeFile(tempDir);
+            });
+        }
+    } catch (err) {
+        console.error('Pairing error:', err);
+        await removeFile(tempDir);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Pairing failed' });
         }
     }
-
-    // Timeout protection (new addition)
-    const timeout = setTimeout(() => {
-        if (!res.headersSent) {
-            res.status(504).json({ error: 'Session timeout' });
-        }
-    }, 300000); // 5 minutes
-
-    await MASTERTECH_MD_PAIR_CODE().finally(() => clearTimeout(timeout));
 };
