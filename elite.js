@@ -1,40 +1,35 @@
-const express = require('express');
-const path = require('path');
-const helmet = require('helmet');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+import express from 'express';
+import path from 'path';
+import helmet from 'helmet';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import { fileURLToPath } from 'url';
+import qrRouter from './qr.js';
+import pairRouter from './pair.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8000;
-const __path = process.cwd();
 
-// Security Middlewares
+// Security Middleware
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
-            styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "files.catbox.moe"],
             connectSrc: ["'self'"],
-            mediaSrc: ["'self'", "files.catbox.moe"],
-            fontSrc: ["'self'", "fonts.gstatic.com"]
+            mediaSrc: ["'self'", "files.catbox.moe"]
         }
-    },
-    hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true
     }
 }));
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' ? 
         ['https://yourdomain.com'] : 
-        ['http://localhost:3000'],
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+        ['http://localhost:3000']
 }));
 
 app.disable('x-powered-by');
@@ -42,12 +37,9 @@ app.disable('x-powered-by');
 // Rate Limiting
 const limiter = rateLimit({
     windowMs: 60 * 1000,
-    max: process.env.RATE_LIMIT || 15,
-    message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false
+    max: parseInt(process.env.RATE_LIMIT) || 15,
+    standardHeaders: true
 });
-
 app.use(limiter);
 
 // Body Parsers
@@ -55,45 +47,35 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Static Files
-app.use(express.static(path.join(__path, 'public'), {
-    setHeaders: (res) => {
-        res.set('X-Content-Type-Options', 'nosniff');
-    }
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
-const qrRouter = require('./qr');
-const pairRouter = require('./pair');
-
 app.use('/api/qr', qrRouter);
 app.use('/api/pair', pairRouter);
 
 // HTML Routes
 app.get('/pair', (req, res) => {
-    res.sendFile(path.join(__path, 'pair.html'), {
-        headers: {
-            'X-Frame-Options': 'DENY'
-        }
-    });
+    res.sendFile(path.join(__dirname, 'pair.html'));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__path, 'main.html'), {
-        headers: {
-            'X-Frame-Options': 'DENY'
-        }
-    });
+    res.sendFile(path.join(__dirname, 'main.html'));
+});
+
+// Health Check
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
 });
 
 // Error Handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).sendFile(path.join(__path, '500.html'));
+    res.status(500).send('Server Error');
 });
 
 // 404 Handler
 app.use((req, res) => {
-    res.status(404).sendFile(path.join(__path, '404.html'));
+    res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
 // Server
@@ -103,15 +85,11 @@ const server = app.listen(PORT, () => {
 
 // Graceful Shutdown
 process.on('SIGTERM', () => {
-    console.log('SIGTERM received. Shutting down gracefully');
-    server.close(() => {
-        console.log('Process terminated');
-    });
+    console.log('Shutting down gracefully');
+    server.close(() => process.exit(0));
 });
 
 process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err);
+    console.error('Unhandled rejection:', err);
     server.close(() => process.exit(1));
 });
-
-module.exports = app;
