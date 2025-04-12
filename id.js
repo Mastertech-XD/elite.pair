@@ -1,55 +1,43 @@
 const crypto = require('crypto');
-const { WA_DEFAULT_EPOCH } = require('./config'); // Your WhatsApp config
+const WA_DEFAULT_EPOCH = process.env.WA_EPOCH || 1672531200; // Jan 1, 2023 as default
 
-/**
- * WhatsApp Session ID Generator
- * Generates cryptographically secure IDs for bot sessions
- */
 class WABotSession {
-  constructor() {
-    this.charPool = this.#initCharPool();
-  }
-
-  // Initialize WhatsApp-safe character pool
-  #initCharPool() {
-    const alphanum = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // WhatsApp-friendly chars
-    const specials = '-_~.!$*'; // Safe special characters
-    return alphanum + specials;
-  }
-
-  /**
-   * Generate a WhatsApp-compatible session ID
-   * @param {number} length - Default 500 as per WhatsApp requirements
-   * @returns {string} Secure session ID
-   */
-  generate(length = 500) {
-    if (length < 64 || length > 1024) {
-      throw new Error('WhatsApp requires IDs between 64-1024 characters');
+    constructor() {
+        if (!WA_DEFAULT_EPOCH || isNaN(WA_DEFAULT_EPOCH)) {
+            throw new Error('Invalid WA_DEFAULT_EPOCH');
+        }
+        this.charPool = this.#initCharPool();
     }
 
-    const bytes = crypto.randomBytes(Math.ceil(length * 0.75)); // Optimal byte calculation
-    let sessionId = '';
-
-    // WhatsApp-specific ID format: BOT<version>_<timestamp>_<random>
-    const prefix = `BOT2_${Date.now() - WA_DEFAULT_EPOCH}_`;
-    
-    for (let i = 0; i < bytes.length; i++) {
-      sessionId += this.charPool[bytes[i] % this.charPool.length];
-      if (sessionId.length >= length - prefix.length) break;
+    #initCharPool() {
+        const alphanum = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const specials = '-_~.!$*';
+        return alphanum + specials;
     }
 
-    return prefix + sessionId.substring(0, length - prefix.length);
-  }
+    generate(length = 500) {
+        if (typeof length !== 'number' || length < 64 || length > 1024) {
+            throw new Error('Invalid length: must be between 64-1024 characters');
+        }
 
-  /**
-   * Generate multiple sessions for multi-device support
-   * @param {number} count - Number of sessions to generate
-   * @returns {string[]} Array of session IDs
-   */
-  generateBulk(count) {
-    return Array.from({ length: count }, () => this.generate());
-  }
+        const bytes = crypto.randomBytes(Math.ceil(length * 0.75));
+        let sessionId = '';
+        const prefix = `BOT2_${Date.now() - WA_DEFAULT_EPOCH}_`;
+
+        for (let i = 0; i < bytes.length; i++) {
+            sessionId += this.charPool[bytes[i] % this.charPool.length];
+            if (sessionId.length >= length - prefix.length) break;
+        }
+
+        return prefix + sessionId.substring(0, length - prefix.length);
+    }
+
+    generateBulk(count) {
+        if (typeof count !== 'number' || count <= 0 || count > 100) {
+            throw new Error('Invalid count: must be between 1-100');
+        }
+        return Array.from({ length: count }, () => this.generate());
+    }
 }
 
-// Singleton instance for the bot
 module.exports = new WABotSession();
