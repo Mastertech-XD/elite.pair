@@ -1,12 +1,20 @@
-const crypto = require('crypto');
-const fs = require('fs/promises');
+const PastebinAPI = require('pastebin-js');
+const { makeid } = require('./id');
+const fs = require('fs');
 const path = require('path');
-const { default: WhatsAppBot } = require('@whiskeysockets/baileys');
+const crypto = require('crypto');
+const pino = require('pino');
+const {
+    default: MasterpeaceEliteBot,
+    useMultiFileAuthState,
+    delay,
+    makeCacheableSignalKeyStore,
+} = require('maher-zubair-baileys');
 
-// Your original audio links preserved exactly
-const AUDIO_LIBRARY = [
+// Restored all original audio URLs exactly
+const audioUrls = [
     "https://files.catbox.moe/hpwsi2.mp3",
-    "https://files.catbox.moe/xci982.mp3", 
+    "https://files.catbox.moe/xci982.mp3",
     "https://files.catbox.moe/utbujd.mp3",
     "https://files.catbox.moe/w2j17k.m4a",
     "https://files.catbox.moe/851skv.m4a",
@@ -15,70 +23,131 @@ const AUDIO_LIBRARY = [
     "https://files.catbox.moe/efmcxm.mp3",
     "https://files.catbox.moe/gco5bq.mp3",
     "https://files.catbox.moe/26oeeh.mp3"
-].map(url => ({
-    url,
-    hash: crypto.createHash('sha256').update(url).digest('hex') // Security measure
-}));
+];
 
-async function getRandomAudio() {
-    const randomIndex = crypto.randomInt(0, AUDIO_LIBRARY.length);
-    return AUDIO_LIBRARY[randomIndex];
+// Restored original padding function
+function generateRandomString(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
 }
 
-// Enhanced session handler with your audio links
-async function handlePairingSession(number) {
-    const sessionId = crypto.randomBytes(16).toString('hex');
-    const sessionDir = `./sessions/${sessionId}`;
-    
+// Enhanced file removal with logging
+function removeFile(filePath) {
     try {
-        await fs.mkdir(sessionDir, { recursive: true });
-        
-        // WhatsApp connection setup
-        const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
-        const bot = WhatsAppBot({ /* your config */ });
-        
-        if (!bot.authState.creds.registered) {
-            const pairingCode = await bot.requestPairingCode(number);
-            
-            bot.ev.on('connection.update', async (update) => {
-                if (update.connection === 'open') {
-                    // Your original session confirmation flow
-                    const audio = await getRandomAudio();
-                    
-                    await bot.sendMessage(bot.user.id, { 
-                        text: "Your MASTERTECH-MD session is ready!" 
-                    });
-                    
-                    // Send one of your audio files
-                    await bot.sendMessage(bot.user.id, {
-                        audio: { url: audio.url },
-                        mimetype: audio.url.endsWith('.m4a') ? 'audio/mp4' : 'audio/mpeg'
-                    });
-                }
-            });
-            
-            return { code: pairingCode };
+        if (fs.existsSync(filePath)) {
+            fs.rmSync(filePath, { recursive: true, force: true });
+            console.log(`[CLEANUP] Removed ${filePath}`);
         }
-    } finally {
-        await cleanupSession(sessionDir); 
+    } catch (err) {
+        console.error(`[ERROR] Cleanup failed: ${err.message}`);
     }
 }
 
-// Preserved your original audio sending logic
-async function sendSessionConfirmation(bot) {
-    const audio = await getRandomAudio();
-    
-    await bot.sendMessage(bot.user.id, {
-        audio: { url: audio.url },
-        mimetype: audio.url.endsWith('.m4a') ? 'audio/mp4' : 'audio/mpeg',
-        ptt: true,
-        contextInfo: {
-            externalAdReply: {
-                title: 'MASTERTECH-MD',
-                body: 'Session established!',
-                thumbnailUrl: 'https://files.catbox.moe/v38p4r.jpeg',
-                sourceUrl: 'https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D'
+// Restored original routing with security additions
+module.exports = async (req, res) => {
+    const id = makeid();
+    let num = req.query.number;
+
+    // Security: Validate phone number format
+    if (!/^[\d+]{10,15}$/.test(num)) {
+        return res.status(400).json({ error: 'Invalid phone number format' });
+    }
+
+    async function MASTERTECH_MD_PAIR_CODE() {
+        const tempDir = path.join('./temp', id);
+        const { state, saveCreds } = await useMultiFileAuthState(tempDir);
+
+        try {
+            const Pair_Code_By_Masterpeace_Elite = MasterpeaceEliteBot({
+                auth: {
+                    creds: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }))
+                },
+                printQRInTerminal: false,
+                logger: pino({ level: 'fatal' }),
+                browser: ['Chrome (Linux)', '', '']
+            });
+
+            if (!Pair_Code_By_Masterpeace_Elite.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g, '');
+                const code = await Pair_Code_By_Masterpeace_Elite.requestPairingCode(num);
+
+                if (!res.headersSent) {
+                    res.json({ code });
+                }
+
+                Pair_Code_By_Masterpeace_Elite.ev.on('creds.update', saveCreds);
+                Pair_Code_By_Masterpeace_Elite.ev.on('connection.update', async (s) => {
+                    const { connection, lastDisconnect } = s;
+                    
+                    if (connection === 'open') {
+                        await delay(5000);
+                        const credsPath = path.join(tempDir, 'creds.json');
+                        
+                        // Original encoding logic preserved
+                        const data = fs.readFileSync(credsPath);
+                        let b64data = Buffer.from(data).toString('base64');
+                        let finalSessionCode = `${b64data}${generateRandomString(530 - b64data.length)}`;
+
+                        // Restored original messaging flow
+                        const session = await Pair_Code_By_Masterpeace_Elite.sendMessage(
+                            Pair_Code_By_Masterpeace_Elite.user.id, 
+                            { text: finalSessionCode }
+                        );
+
+                        // Restored exact confirmation message
+                        const confirmationMessage = `✅ *Session Successfully Linked!*\n\n🔑 *Session Code:* \`${finalSessionCode}\`\n\n📞 *Contact:* +254743727510\n🌐 *GitHub:* [Mastertech-MD](https://github.com/mastertech-md)`;
+                        await Pair_Code_By_Masterpeace_Elite.sendMessage(
+                            Pair_Code_By_Masterpeace_Elite.user.id, 
+                            { text: confirmationMessage },
+                            { quoted: session }
+                        );
+
+                        // Restored random audio sending
+                        const randomAudio = audioUrls[Math.floor(Math.random() * audioUrls.length)];
+                        await Pair_Code_By_Masterpeace_Elite.sendMessage(
+                            Pair_Code_By_Masterpeace_Elite.user.id,
+                            {
+                                audio: { url: randomAudio },
+                                mimetype: randomAudio.endsWith('.m4a') ? 'audio/mp4' : 'audio/mpeg',
+                                ptt: true,
+                                contextInfo: {
+                                    externalAdReply: {
+                                        title: 'MASTERTECH-MD',
+                                        body: 'Your session is ready!',
+                                        thumbnailUrl: 'https://files.catbox.moe/v38p4r.jpeg',
+                                        sourceUrl: 'https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D'
+                                    }
+                                }
+                            },
+                            { quoted: session }
+                        );
+
+                        await Pair_Code_By_Masterpeace_Elite.ws.close();
+                        removeFile(tempDir);
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('[SESSION ERROR]', err);
+            removeFile(tempDir);
+            if (!res.headersSent) {
+                res.status(500).json({ code: 'Service Unavailable' });
             }
         }
-    });
-}
+    }
+
+    // Timeout protection (new addition)
+    const timeout = setTimeout(() => {
+        if (!res.headersSent) {
+            res.status(504).json({ error: 'Session timeout' });
+        }
+    }, 300000); // 5 minutes
+
+    await MASTERTECH_MD_PAIR_CODE().finally(() => clearTimeout(timeout));
+};
