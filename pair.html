@@ -4,35 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WhatsApp Pair Code Generator</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: files.catbox.moe">
   <style>
+    :root {
+      --primary: #5935ac;
+      --secondary: #c01736;
+      --bg-dark: rgba(0, 0, 0, 0.85);
+    }
+    
     body {
+      margin: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: url("https://files.catbox.moe/fq30m0.jpg") no-repeat center center fixed;
-      background-size: cover;
+      background: var(--bg-dark) url("https://files.catbox.moe/fq30m0.jpg") no-repeat center/cover fixed;
       font-family: Arial, sans-serif;
       color: #f6f5f5;
     }
-
+    
     .container {
       width: 100%;
       max-width: 400px;
       padding: 20px;
     }
-
+    
     .box {
       width: 100%;
       padding: 25px;
       text-align: center;
       background-color: rgba(0, 0, 0, 0.8);
       border-radius: 10px;
-      box-shadow: 0 0 20px rgba(250, 249, 249, 0.7);
+      box-shadow: 0 0 20px rgba(250, 249, 249, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-
+    
     .input-container {
       display: flex;
       background: #0a0a0a;
@@ -41,7 +47,7 @@
       gap: 0.3rem;
       margin: 20px 0;
     }
-
+    
     .input-container input {
       border-radius: 0.8rem 0 0 0.8rem;
       background: #e8e8e8;
@@ -53,15 +59,10 @@
       color: #000;
       font-size: 16px;
     }
-
-    .input-container input:focus {
-      outline: none;
-      box-shadow: inset 3px 3px 5px #f0f2f3;
-    }
-
+    
     .input-container button {
       padding: 1rem;
-      background: #5935ac;
+      background: var(--primary);
       font-weight: 700;
       color: white;
       border: none;
@@ -69,55 +70,48 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-
+    
     .input-container button:hover {
-      background: linear-gradient(135deg, #c01736 0%, #8b17b6 100%);
+      background: var(--secondary);
     }
-
+    
     #result {
       margin-top: 20px;
       min-height: 50px;
-      word-break: break-all;
-    }
-
-    .copy-btn {
-      background: transparent;
-      color: white;
-      border: 1px solid #5935ac;
+      word-break: break-word;
+      padding: 10px;
       border-radius: 5px;
-      padding: 5px 10px;
-      margin-top: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: rgba(0, 0, 0, 0.5);
     }
-
-    .copy-btn:hover {
-      background: #5935ac;
+    
+    .error {
+      color: #ff6b6b;
     }
-
-    @media (max-width: 500px) {
-      .input-container {
-        flex-direction: row;
-      }
-      
-      .input-container input {
-        border-radius: 0.8rem 0 0 0.8rem;
-      }
-      
-      .input-container button {
-        border-radius: 0 0.8rem 0.8rem 0;
-      }
+    
+    .success {
+      color: #51cf66;
+    }
+    
+    .loading {
+      color: #f8f9fa;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="box">
-      <h2><i class="fas fa-qrcode"></i> WhatsApp Pair Code</h2>
+      <h2>WhatsApp Pair Code</h2>
       <p>Enter your phone number with country code</p>
       
       <div class="input-container">
-        <input type="tel" id="number" placeholder="+263714757xxx" inputmode="numeric">
+        <input 
+          type="tel" 
+          id="number" 
+          placeholder="+254743727510" 
+          inputmode="numeric"
+          pattern="^\+[\d]{10,15}$"
+          required
+        >
         <button id="submit">Generate</button>
       </div>
       
@@ -125,14 +119,13 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const numberInput = document.getElementById('number');
       const submitBtn = document.getElementById('submit');
       const resultDiv = document.getElementById('result');
 
-      // Format phone number as user types
+      // Input validation
       numberInput.addEventListener('input', (e) => {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length > 0) {
@@ -141,77 +134,76 @@
         e.target.value = value;
       });
 
-      // Handle form submission
+      // Form submission
       submitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         
-        const phoneNumber = numberInput.value.replace(/\D/g, '');
+        const phoneNumber = numberInput.value;
         
         // Validate input
-        if (!phoneNumber) {
-          showResult('Please enter a phone number', 'error');
-          return;
-        }
-        
-        if (phoneNumber.length < 10 || phoneNumber.length > 15) {
-          showResult('Number must be 10-15 digits', 'error');
+        if (!phoneNumber || !/^\+[\d]{10,15}$/.test(phoneNumber)) {
+          showResult('Please enter a valid phone number (+country code)', 'error');
           return;
         }
 
         showResult('Generating code...', 'loading');
         
         try {
-          const response = await axios.get(`/code?number=${phoneNumber}`);
+          const response = await fetch(`/api/pair?number=${encodeURIComponent(phoneNumber)}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
           
-          if (response.data?.code) {
-            showResult(`Pair Code: <strong>${response.data.code}</strong>`, 'success');
+          if (!response.ok) {
+            throw new Error(await response.text());
+          }
+          
+          const data = await response.json();
+          
+          if (data?.code) {
+            showResult(`Pair Code: <strong>${data.code}</strong>`, 'success');
           } else {
-            showResult('No code received from server', 'error');
+            showResult('Invalid response from server', 'error');
           }
         } catch (error) {
-          showResult('Failed to generate code. Try again later.', 'error');
-          console.error('API Error:', error);
+          showResult('Failed to generate code. Please try again.', 'error');
+          console.error('Error:', error.message);
         }
       });
 
-      // Display results with styling
       function showResult(message, type) {
         resultDiv.innerHTML = '';
         const p = document.createElement('p');
         p.innerHTML = message;
+        p.className = type;
         
-        if (type === 'error') {
-          p.style.color = '#ff6b6b';
-        } else if (type === 'success') {
-          p.style.color = '#51cf66';
-          
+        if (type === 'success') {
           const copyBtn = document.createElement('button');
-          copyBtn.className = 'copy-btn';
           copyBtn.textContent = 'Copy Code';
-          copyBtn.onclick = () => copyToClipboard(message.replace(/<[^>]*>/g, ''));
+          copyBtn.style.marginTop = '10px';
+          copyBtn.style.padding = '5px 10px';
+          copyBtn.style.borderRadius = '5px';
+          copyBtn.style.border = 'none';
+          copyBtn.style.background = 'var(--primary)';
+          copyBtn.style.color = 'white';
+          copyBtn.style.cursor = 'pointer';
+          
+          copyBtn.addEventListener('click', () => {
+            const code = message.replace(/<[^>]*>/g, '').replace('Pair Code: ', '');
+            navigator.clipboard.writeText(code).then(() => {
+              copyBtn.textContent = 'Copied!';
+              setTimeout(() => {
+                copyBtn.textContent = 'Copy Code';
+              }, 2000);
+            });
+          });
           
           resultDiv.appendChild(p);
           resultDiv.appendChild(copyBtn);
         } else {
-          p.style.color = '#f8f9fa';
-        }
-        
-        resultDiv.appendChild(p);
-      }
-
-      // Clipboard function
-      async function copyToClipboard(text) {
-        try {
-          await navigator.clipboard.writeText(text.replace('Pair Code: ', ''));
-          const copyBtn = document.querySelector('.copy-btn');
-          if (copyBtn) {
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => {
-              copyBtn.textContent = 'Copy Code';
-            }, 2000);
-          }
-        } catch (err) {
-          alert('Failed to copy. Please copy manually.');
+          resultDiv.appendChild(p);
         }
       }
     });
