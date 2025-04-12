@@ -1,25 +1,67 @@
 {
-    "description": "mastertech-md sessions",
-    "main": "./elite.js",
-  "engines" : { 
-    "npm" : ">=9.7.2",
-    "node" : ">=20.0.0"
-    },
-    "scripts": {
-    "start": "node elite-pair"
+  "name": "mastertech-md-sessions",
+  "version": "2.0.0",
+  "description": "Secure WhatsApp Bot Session Management for MASTERTECH-MD",
+  "main": "./lib/elite.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.7.2",
+    "pnpm": ">=8.0.0"
   },
-  "author": "masterpeace elite",
-  "license": "GPL-3.0 license",
+  "scripts": {
+    "start": "NODE_ENV=production node --enable-source-maps lib/elite.js",
+    "dev": "NODE_ENV=development nodemon lib/elite.js",
+    "test": "vitest run",
+    "lint": "eslint . --ext .js,.cjs,.mjs",
+    "security-check": "npm audit --production --audit-level=critical",
+    "build": "tsc && npm run lint",
+    "prepare": "husky install"
+  },
+  "author": "Masterpeace Elite <contact@mastertech-md.tech>",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.5.0",
-    "maher-zubair-baileys": "^6.6.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^7.0.0",
+    "pino": "^8.15.1",
+    "pino-pretty": "^10.2.3",
     "qrcode": "^1.5.3",
-    "awesome-phonenumber": "^2.64.0",
-    "pino": "^8.1.0",
-    "phone" : "3.1.30",
-    "body-parser": "^1.20.1",
-    "pastebin-js": "^1.0.6",
-    "express": "^4.18.1",
-    "path": "^0.12.7"
-   }
+    "awesome-phonenumber": "^3.2.0",
+    "phone": "^3.1.31",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.3.1",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "eslint": "^8.50.0",
+    "vitest": "^1.0.4",
+    "typescript": "^5.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1"
+  },
+  "files": [
+    "lib/**/*",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mastertech-XD/elite.pair.git"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "session",
+    "baileys",
+    "mastertech-md"
+  ],
+  "bugs": {
+    "url": "https://github.com/Mastertech-XD/elite.pair/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }
