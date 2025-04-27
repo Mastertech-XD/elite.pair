@@ -1,65 +1,106 @@
+const PastebinAPI = require('pastebin-js'),
+pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep');
+const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
-const { default: makeWASocket, useMultiFileAuthState, delay } = require('@whiskeysockets/baileys');
-const router = express.Router();
+let router = express.Router();
+const pino = require("pino");
+const {
+    default: MASTER_Tech,
+    useMultiFileAuthState,
+    delay,
+    makeCacheableSignalKeyStore,
+    Browsers
+} = require("maher-zubair-baileys");
 
-// Auth folder setup
-const authFolder = './auth_info';
-if (!fs.existsSync(authFolder)) fs.mkdirSync(authFolder);
+function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
+};
 
 router.get('/', async (req, res) => {
-    const number = req.query.number?.replace(/\D/g, '');
-    if (!number) return res.status(400).send('Missing phone number');
+    const id = makeid();
+    let num = req.query.number;
 
-    try {
-        const { state, saveCreds } = await useMultiFileAuthState(authFolder);
-        const sock = makeWASocket({
-            auth: state,
-            printQRInTerminal: false,
-            browser: ["Chrome (Linux)", "", ""]
-        });
+    async function MASTERTECH_XD_PAIR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        try {
+            let Pair_Code_By_Elite_Tech = MASTER_Tech({
+                auth: {
+                    creds: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                },
+                printQRInTerminal: false,
+                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                browser: ["Chrome (Linux)", "", ""]
+            });
 
-        sock.ev.on('connection.update', async (update) => {
-            if (update.connection === 'open') {
-                console.log('✅ Connected to WhatsApp');
-                
-                if (!sock.authState.creds.registered) {
-                    const pairingCode = await sock.requestPairingCode(number);
-                    res.send({ code: pairingCode });
+            // Setup event listeners BEFORE requesting pairing code
+            Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds);
+            Pair_Code_By_Elite_Tech.ev.on("connection.update", async (s) => {
+                const { connection, lastDisconnect } = s;
+
+                if (connection == "open") {
+                    await delay(5000);
+                    let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                    await delay(800);
+                    let b64data = Buffer.from(data).toString('base64');
+
+                    let session = await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: '' + b64data });
+
+                    let ELITE_TECH_TEXT = `
+*_Pair Code Connected by Elite-Tech_*
+*_Made With ♥️👀_*
+______________________________________
+╔════◇
+║ *『 AMAZING YOU'VE CHOSEN ELITE-TECH 』*
+║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
+╚════════════════════════╝
+╔═════◇
+║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
+║❒ *Owner:* https://wa.me/254743727510_
+║❒ *Repo:* _https://github.com/Elite-Tech/elite-tech/_
+║❒ *WaChannel:* _https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
+║❒ *Plugins:* _https://github.com/Elite-Tech/elite-tech 
+╚════════════════════════╝
+_____________________________________
+
+_Don't Forget To Give Star To My Repo_`;
+
+                    await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: ELITE_TECH_TEXT }, { quoted: session });
+
+                    await delay(100);
+                    // DO NOT CLOSE WS
+                    // DO NOT DELETE SESSION
+                    console.log('Bot is now fully connected and staying online.');
+                } 
+                else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                    console.log('Connection closed, retrying in 10s...');
+                    await delay(10000);
+                    await MASTERTECH_XD_PAIR_CODE();
                 }
+            });
 
-                // Send welcome message after successful pairing
-                const welcomeMessage = `
-                *Pairing Successful!* 🎉
+            if (!Pair_Code_By_Elite_Tech.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g, '');
+                const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num);
 
-                *Elite-Tech WhatsApp Bot*
-                ───────────────────
-                • Owner: https://wa.me/254743727510
-                • GitHub: https://github.com/Elite-Tech
-                • Channel: https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
-                ───────────────────
-                _Bot is now active!_`;
-
-                await sock.sendMessage(
-                    sock.user.id, 
-                    { text: welcomeMessage }
-                );
-
-                sock.ev.on('creds.update', saveCreds);
+                if (!res.headersSent) {
+                    await res.send({ code });
+                }
             }
-            
-            if (update.connection === 'close') {
-                console.log('❌ Connection closed');
+
+        } catch (err) {
+            console.log("service restarted due to error:", err.message);
+            await removeFile('./temp/' + id);
+            if (!res.headersSent) {
+                await res.send({ code: "Service Unavailable" });
             }
-        });
-
-        // Cleanup on process exit
-        process.on('exit', () => sock.end());
-
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Pairing failed');
+        }
     }
+
+    return await MASTERTECH_XD_PAIR_CODE();
 });
 
 module.exports = router;
