@@ -1,7 +1,6 @@
 # **✨ Mastertech-Session-Generator ✨**  
 ### *(By Masterpeace Elite)*  
 
-### Typing SVG Demo  
 [![Typing Animation](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=24&duration=3000&pause=1000&color=00FF00&width=500&lines=⚡+Masterpeace+Elite+Session;🚀+QR+%26+Web+Pair+Code;🔒+Baileys+WhatsApp+Bot)](https://git.io/typing-svg)  
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#)  
@@ -11,6 +10,8 @@
     <img src="https://telegra.ph/file/dc73e16b9988c7c56b56f.jpg" width="500" alt="Masterpeace Elite Banner">
   </a>
 </p>
+
+[![Typing Animation](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=24&duration=3000&pause=1000&color=00FF00&width=500&lines=⚡+Masterpeace+Elite+Session;🚀+QR+%26+Web+Pair+Code;🔒+Baileys+WhatsApp+Bot)](https://git.io/typing-svg)  
 
 <p align="center"><img src="https://profile-counter.glitch.me/{Mastertech-XD}/count.svg" alt="Masterpeace Elite :: Visitor's Count" /></p>  
 
