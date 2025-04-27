@@ -9,8 +9,7 @@ const {
     default: MASTER_Tech,
     useMultiFileAuthState,
     delay,
-    makeCacheableSignalKeyStore,
-    Browsers
+    makeCacheableSignalKeyStore
 } = require("maher-zubair-baileys");
 
 function removeFile(FilePath) {
@@ -38,44 +37,32 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({ level: "silent" }).child({ level: "silent" }),
-                // 👇 Force Chrome (Linux) as the browser
-                browser: ["Chrome (Linux)", "", ""],
+                browser: ["Chrome (Linux)", "", ""], // Force Chrome Linux
                 syncFullHistory: false,
-                markOnlineOnConnect: false,
-                shouldIgnoreJid: jid => jid === 'status@broadcast',
-                connectTimeoutMs: 30000,
-                keepAliveIntervalMs: 15000
+                markOnlineOnConnect: true, // Show as online
+                connectTimeoutMs: 60000,
+                keepAliveIntervalMs: 20000
             });
 
             Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds);
 
             Pair_Code_By_Elite_Tech.ev.on("connection.update", async (update) => {
-                const { connection, lastDisconnect, qr } = update;
-
-                if (qr) {
-                    // QR code generated event (if needed)
-                }
+                const { connection, lastDisconnect } = update;
 
                 if (connection === "open") {
-                    console.log("✅ Connection opened successfully (Chrome Linux)");
-
-                    await delay(2000);
+                    console.log("✅ Connected to WhatsApp");
 
                     if (!Pair_Code_By_Elite_Tech.authState.creds.registered) {
                         num = num.replace(/[^0-9]/g, '');
                         const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num);
-
+                        
                         if (!res.headersSent) {
                             res.send({ code });
                         }
                     } else {
                         let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
                         let b64data = Buffer.from(data).toString('base64');
-                        let session = await Pair_Code_By_Elite_Tech.sendMessage(
-                            Pair_Code_By_Elite_Tech.user.id,
-                            { text: b64data }
-                        );
-
+                        
                         const ELITE_TECH_TEXT = `
 *_Pair Code Connected by Elite-Tech_*
 *_Made With ♥️👀_*
@@ -97,54 +84,39 @@ _Don't Forget To Give Star To My Repo_`;
 
                         await Pair_Code_By_Elite_Tech.sendMessage(
                             Pair_Code_By_Elite_Tech.user.id,
-                            { text: ELITE_TECH_TEXT },
-                            { quoted: session }
+                            { text: ELITE_TECH_TEXT }
                         );
-
-                        await delay(500);
-                        await Pair_Code_By_Elite_Tech.ws.close();
-                        await removeFile('./temp/' + id);
+                        
+                        // Session remains active
+                        console.log("🟢 Bot is now online and staying connected");
                     }
                 } else if (connection === "close") {
-                    const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
-                    console.log("❌ Connection closed", { lastDisconnect, shouldReconnect });
-
-                    if (shouldReconnect) {
-                        await delay(10000);
-                        MASTERTECH_XD_PAIR_CODE().catch(err => {
-                            console.error("Reconnection error:", err);
-                            if (!res.headersSent) {
-                                res.status(500).send({ error: "Reconnection failed" });
-                            }
-                        });
-                    }
+                    console.log("❌ Connection closed", lastDisconnect?.error);
+                    await delay(5000);
+                    await removeFile('./temp/' + id);
                 }
             });
 
         } catch (err) {
-            console.error("Error in pairing process:", err);
-
-            if (Pair_Code_By_Elite_Tech) {
-                await Pair_Code_By_Elite_Tech.ws?.close();
-            }
-
+            console.error("Pairing error:", err);
+            if (Pair_Code_By_Elite_Tech?.ws) await Pair_Code_By_Elite_Tech.ws.close();
             await removeFile('./temp/' + id);
-
+            
             if (!res.headersSent) {
-                res.status(500).send({
-                    code: "Service Unavailable",
-                    error: err.message
+                res.status(500).send({ 
+                    error: "Pairing failed",
+                    message: err.message 
                 });
             }
         }
     }
 
-    // Timeout after 1 minute
+    // Timeout after 2 minutes
     const timeout = setTimeout(() => {
         if (!res.headersSent) {
-            res.status(504).send({ error: "Pairing process timed out" });
+            res.status(504).send({ error: "Pairing timed out" });
         }
-    }, 60000);
+    }, 120000);
 
     try {
         await MASTERTECH_XD_PAIR_CODE();
