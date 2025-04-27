@@ -57,24 +57,24 @@ router.get('/', async (req, res) => {
                let session = await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id, { text: '' + b64data });
 
                let GIFTED_MD_TEXT = `
-*Pair Code Connected by Elite-Tech*
-*Made With ❤️*
-______________________________________
-╔════════════◇═══════════
-║ *『 YOU'VE CHOSEN ELITE-TECH 』*
-║ WhatsApp Bot Deployment Started
-╚════════════════════════╝
-╔════════════◇════════════
-║  『••• CONTACT & RESOURCES •••』        
-║❒ *Owner:* https://wa.me/254743727510
-║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
-║❒ *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
-║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
-╚════════════════════════╝
-_____________________________________`;
+               *Pair Code Connected by Elite-Tech*
+               *Made With ❤️*
+               ______________________________________
+               ╔════════════◇═══════════
+               ║ *『 YOU'VE CHOSEN ELITE-TECH 』*
+               ║ WhatsApp Bot Deployment Started
+               ╚════════════════════════╝
+               ╔════════════◇════════════
+               ║  『••• CONTACT & RESOURCES •••』        
+               ║❒ *Owner:* https://wa.me/254743727510
+               ║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
+               ║❒ *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
+               ║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
+               ╚════════════════════════╝
+               _____________________________________`;
 
-_Don't Forget To Give Star To My Repo_`
- await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
+                    _Don't Forget To Give Star To My Repo_`
+                        await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
  
 
         await delay(100);
