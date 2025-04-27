@@ -61,14 +61,14 @@ router.get('/', async (req, res) => {
 *_Made With 🚬🗿_*
 ______________________________________
 ╔════◇
-║ *『 AMAZING YOU'VE CHOSEN ELITE-TECH 』*
+║ *『 AMAZING YOU'VE CHOSEN ELITE-TECH-XD』*
 ║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
 ╚════════════════════════╝
 ╔═════◇
 ║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
 ║❒ *Owner:* https://wa.me/254743727510_
 ║❒ *Repo:* _https://github.com/Elite-Tech/elite-tech/_
-║❒ *WaChannel:* _https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
+║❒ *WaChannel:* _https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
 ║❒ *Plugins:* _https://github.com/Elite-Tech/elite-tech 
 ╚════════════════════════╝
 _____________________________________
