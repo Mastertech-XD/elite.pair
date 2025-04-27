@@ -2,210 +2,414 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pair Code - MasterTech Elite</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pair Code</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary-color: #6e3bdc;
+      --secondary-color: #c01736;
+      --accent-color: #8b17b6;
+      --text-color: #f1f1f1;
+      --bg-color: #0a0a0a;
+      --card-bg: rgba(20, 20, 20, 0.8);
+      --input-bg: #1a1a1a;
+      --success-color: #4CAF50;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      font-family: 'Poppins', Arial, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      overflow: hidden;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-color);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(110, 59, 220, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(192, 23, 54, 0.15) 0%, transparent 50%);
+      z-index: -1;
     }
 
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 1s ease-in;
+      width: 100%;
+      padding: 20px;
+      animation: fadeIn 0.8s ease-out;
     }
 
     .box {
-      width: 340px;
-      padding: 30px 25px;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      width: 100%;
+      max-width: 380px;
+      padding: 30px;
       text-align: center;
-      transition: transform 0.3s ease;
+      background-color: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
 
     .box:hover {
-      transform: scale(1.03);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
     }
 
-    .box h3 {
-      margin: 10px 0;
-      font-size: 24px;
-      color: #fff;
+    .box::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        transparent 45%,
+        rgba(110, 59, 220, 0.1) 50%,
+        transparent 55%
+      );
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
     }
 
-    .box h6 {
-      font-weight: normal;
-      font-size: 14px;
-      color: #ccc;
-      margin: 5px 0;
-    }
-
-    .input-container {
-      margin-top: 20px;
-      display: flex;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .input-container input {
-      border: none;
-      outline: none;
-      padding: 15px;
-      background: none;
-      color: #fff;
-      width: 75%;
-      font-size: 16px;
-    }
-
-    .input-container input::placeholder {
-      color: #ccc;
-    }
-
-    .input-container button {
-      width: 25%;
-      background: #ff416c;
-      background: linear-gradient(to right, #ff4b2b, #ff416c);
-      border: none;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      transition: 0.3s;
-    }
-
-    .input-container button:hover {
-      background: linear-gradient(to right, #ff416c, #ff4b2b);
-    }
-
-    #waiting-message {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #ccc;
-    }
-
-    #pair {
-      margin-top: 15px;
-      font-size: 18px;
-    }
-
-    #copy {
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    #copy:hover {
-      color: #00ffe7;
+    @keyframes shine {
+      0% { transform: rotate(30deg) translate(-30%, -30%); }
+      100% { transform: rotate(30deg) translate(30%, 30%); }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      text-shadow: 0 0 10px rgba(110, 59, 220, 0.5);
+    }
+
+    .title {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .input-container {
+      display: flex;
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 5px;
+      gap: 5px;
+      width: 100%;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .input-container:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(110, 59, 220, 0.3);
+    }
+
+    .input-container input {
+      border-radius: 8px 0 0 8px;
+      background: var(--input-bg);
+      width: 100%;
+      flex-basis: 75%;
+      padding: 15px;
+      border: none;
+      color: var(--text-color);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-container input:focus {
+      outline: none;
+      background: #222;
+    }
+
+    .input-container input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+    }
+
+    .input-container button {
+      flex-basis: 25%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      font-weight: 600;
+      letter-spacing: 0.1rem;
+      text-transform: uppercase;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .input-container button:hover {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+      transform: translateY(-2px);
+    }
+
+    .input-container button:active {
+      transform: translateY(0);
+    }
+
+    .result-container {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .copy-btn i {
+      font-size: 0.9rem;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+    }
+
+    .floating-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
     }
 
     @media (max-width: 500px) {
       .box {
-        width: 90%;
-        padding: 20px;
+        padding: 25px 20px;
       }
-
+      
       .input-container {
         flex-direction: column;
       }
-
-      .input-container input, .input-container button {
+      
+      .input-container input {
+        border-radius: 8px;
+        margin-bottom: 5px;
+      }
+      
+      .input-container button {
+        border-radius: 8px;
         width: 100%;
       }
-
-      .input-container button {
-        margin-top: 10px;
+      
+      .title {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
-
 <body>
+  <div class="floating-particles" id="particles"></div>
   <div class="container">
     <div class="box" id="box">
-      <i class="fa fa-user fa-2x"></i>
-      <h3>PAIRING CODE</h3>
-      <h6>Made by MASTERTECH ELITE 🗽</h6>
-      <h6>Enter Your Number with Country Code</h6>
-      <div class="input-container">
-        <input placeholder="25474372××××" type="number" id="number">
-        <button id="submit">Submit</button>
+      <div class="logo">
+        <i class="fas fa-code"></i>
       </div>
-      <a id="waiting-message" style="display: none;">Please wait a while...</a>
-      <main id="pair"></main>
+      <h1 class="title">PAIRING CODE</h1>
+      <p class="subtitle">Enter your WhatsApp number with country code to generate your pairing code</p>
+      
+      <div class="input-container">
+        <input type="tel" id="number" placeholder="e.g. 25474372××××" pattern="[0-9]*" inputmode="numeric">
+        <button id="submit">SUBMIT</button>
+      </div>
+      
+      <div class="result-container" id="result">
+        <button class="copy-btn" id="copy">
+          <i class="fas fa-copy"></i>
+          <span id="code-text">COPY CODE</span>
+        </button>
+      </div>
+      
+      <div class="footer">
+        <p>Made with <i class="fas fa-heart" style="color: var(--secondary-color);"></i> by MASTERTECH ELITE</p>
+      </div>
     </div>
   </div>
-
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    let a = document.getElementById("pair");
-    let b = document.getElementById("submit");
-    let c = document.getElementById("number");
-
-    async function Copy() {
-      let text = document.getElementById("copy").innerText;
-      let obj = document.getElementById("copy");
-      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
-      obj.innerText = "COPIED!";
-      obj.style.color = "lime";
-      setTimeout(() => {
-        obj.innerText = text;
-        obj.style.color = "red";
-      }, 800);
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      
+      // Random size between 1px and 3px
+      const size = Math.random() * 2 + 1;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // Random position
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.bottom = `-10px`;
+      
+      // Random animation duration
+      const duration = Math.random() * 20 + 10;
+      particle.style.animationDuration = `${duration}s`;
+      
+      // Random delay
+      particle.style.animationDelay = `${Math.random() * 10}s`;
+      
+      particlesContainer.appendChild(particle);
     }
 
-    b.addEventListener("click", async (e) => {
+    // Main functionality
+    const resultContainer = document.getElementById("result");
+    const copyBtn = document.getElementById("copy");
+    const codeText = document.getElementById("code-text");
+    const submitBtn = document.getElementById("submit");
+    const numberInput = document.getElementById("number");
+    const box = document.getElementById("box");
+
+    async function copyToClipboard() {
+      const code = codeText.innerText.replace('CODE: ', '');
+      try {
+        await navigator.clipboard.writeText(code);
+        codeText.innerHTML = '<span style="color: var(--success-color);">COPIED!</span>';
+        setTimeout(() => {
+          codeText.innerHTML = `CODE: <span style="color: white;">${code}</span>`;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+    }
+
+    submitBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (!c.value) {
-        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
-      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
-        a.innerHTML = '<a style="color:red;font-weight:bold">Invalid Number</a><br><br>';
-      } else {
-        const Wasi_Tech = c.value.replace(/[^0-9]/g, "");
-        let bb = "";
-        let bbc = "";
-        const cc = Wasi_Tech.split('');
-        cc.map(a => {
-          bbc += a;
-          if (bbc.length == 3 || bbc.length == 8) {
-            bb += " " + a;
-          } else {
-            bb += a;
-          }
-        });
-        c.type = "text";
-        c.value = "+" + bb;
-        c.style.color = "white";
-        c.style.fontSize = "18px";
-        a.innerHTML = '<a style="color:white;font-weight:bold">Please Wait...</a><br><br>';
-        try {
-          let { data } = await axios(`/code?number=${Wasi_Tech}`);
-          let code = data.code || "Service Unavailable";
-          a.innerHTML = `<font id="copy" onclick="Copy()" style="color:red;font-weight:bold;cursor:pointer;">CODE: <span style="color:white;">${code}</span></font><br><br><br>`;
-        } catch (err) {
-          a.innerHTML = '<a style="color:red;font-weight:bold">Failed to fetch code. Try again.</a><br><br>';
-        }
+      
+      if (!numberInput.value) {
+        showResult('Please enter your WhatsApp number', 'error');
+        return;
+      }
+      
+      const cleanNumber = numberInput.value.replace(/[^0-9]/g, "");
+      
+      if (cleanNumber.length < 11) {
+        showResult('Invalid number format', 'error');
+        return;
+      }
+      
+      // Format the number for display
+      const formattedNumber = `+${cleanNumber.substring(0, 3)} ${cleanNumber.substring(3, 5)} ${cleanNumber.substring(5, 8)} ${cleanNumber.substring(8)}`;
+      numberInput.value = formattedNumber;
+      
+      showResult('Generating code...', 'loading');
+      
+      try {
+        const { data } = await axios.get(`/code?number=${cleanNumber}`);
+        const code = data.code || "Service Unavailable";
+        showResult(`CODE: <span style="color: white;">${code}</span>`, 'success');
+      } catch (error) {
+        console.error('Error:', error);
+        showResult('Failed to generate code', 'error');
       }
     });
+
+    function showResult(message, type) {
+      resultContainer.style.display = 'block';
+      codeText.innerHTML = message;
+      
+      // Reset all classes
+      resultContainer.className = 'result-container';
+      copyBtn.style.display = 'none';
+      
+      // Add appropriate class based on type
+      if (type === 'error') {
+        resultContainer.classList.add('error');
+        copyBtn.style.display = 'none';
+      } else if (type === 'loading') {
+        resultContainer.classList.add('loading');
+        copyBtn.style.display = 'none';
+      } else if (type === 'success') {
+        resultContainer.classList.add('success');
+        copyBtn.style.display = 'flex';
+        copyBtn.addEventListener('click', copyToClipboard);
+      }
+    }
   </script>
 </body>
 </html>
