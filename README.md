@@ -1,9 +1,8 @@
 # **✨ Mastertech-Session-Generator ✨**  
 ### *(By Masterpeace Elite)*  
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#)  
-
-<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=EB+Garamond&weight=800&size=28&duration=4000&pause=1000&random=false&width=435&lines=⚡+MASTERPEACE+ELITE+SESSION;🚀+QR+%26+WEB+PAIR+CODE;🔒+WHISKEYSOCKETS%2FBAILEYS+BOT" alt="Typing SVG" /></a>  
+### Typing SVG Demo  
+[![Typing Animation](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=24&duration=3000&pause=1000&color=00FF00&width=500&lines=⚡+Masterpeace+Elite+Session;🚀+QR+%26+Web+Pair+Code;🔒+Baileys+WhatsApp+Bot)](https://git.io/typing-svg)  
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#)  
 
