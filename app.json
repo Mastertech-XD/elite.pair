@@ -1,8 +1,8 @@
 {
-    "name": "Wasi Session Generator",
-    "description": "I'm Web Session Generator by Itxx Me Wasi",
+    "name": "Session code Generator",
+    "description": "I'm Web Session Generator by Elite-XD",
     "logo": "",
-    "repository": "https://github.com/Giftedmaurice/giftedmdV2-session-generator",
+    "repository": "https://github.com/Mastertech-XD/elite.pair/",
     "keywords": ["@Xcelsama"],
     "success_url": "/", 
     "buildpacks": [{ "url": "https://github.com/heroku/heroku-buildpack-nodejs#latest" } ],
