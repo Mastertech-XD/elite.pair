@@ -1,167 +1,98 @@
-const { makeid } = require('./id');
+const PastebinAPI = require('pastebin-js'),
+pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep')
+const {makeid} = require('./id');
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
-const router = express.Router();
+let router = express.Router()
 const pino = require("pino");
 const {
-    default: makeWASocket,
+    default: MASTER_Tech,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
     Browsers
-} = require("@whiskeysockets/baileys");
+} = require("maher-zubair-baileys");
 
-// Configure logger for better debugging
-const logger = pino({ level: 'debug' }).child({ module: 'pairing-code' });
-
-// Improved file removal function
-async function removeFile(FilePath) {
-    try {
-        if (!fs.existsSync(FilePath)) return false;
-        fs.rmSync(FilePath, { recursive: true, force: true });
-        return true;
-    } catch (err) {
-        logger.error(`Failed to remove ${FilePath}: ${err}`);
-        return false;
-    }
-}
-
-// Ensure temp directory exists
-const tempDir = path.join(__dirname, 'temp');
-if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-}
-
+function removeFile(FilePath){
+    if(!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true })
+ };
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
+        async function MASTERTECH_XD_PAIR_CODE() {
+        const {
+            state,
+            saveCreds
+        } = await useMultiFileAuthState('./temp/'+id)
+     try {
+            let Pair_Code_By_Elite_Tech = MASTER_Tech({
+                auth: {
+                    creds: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
+                },
+                printQRInTerminal: false,
+                logger: pino({level: "fatal"}).child({level: "fatal"}),
+                browser: ["Chrome (Linux)", "", ""]
+             });
+             if(!Pair_Code_By_Elite_Tech.authState.creds.registered) {
+                await delay(1500);
+                        num = num.replace(/[^0-9]/g,'');
+                            const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num)
+                 if(!res.headersSent){
+                 await res.send({code});
+                     }
+                 }
+            Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds)
+            Pair_Code_By_Elite_Tech.ev.on("connection.update", async (s) => {
+                const {
+                    connection,
+                    lastDisconnect
+                } = s;
+                if (connection == "open") {
+                await delay(5000);
+                let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                await delay(800);
+               let b64data = Buffer.from(data).toString('base64');
+               let session = await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: '' + b64data });
 
-    // Validate phone number
-    if (!num || !/^[\d+]+$/.test(num)) {
-        return res.status(400).json({ error: "Invalid phone number format" });
-    }
-
-    num = num.replace(/[^0-9]/g, '');
-    const authDir = path.join(tempDir, id);
-
-    try {
-        logger.debug(`Starting pairing process for ${num}`);
-        
-        const { state, saveCreds } = await useMultiFileAuthState(authDir);
-        
-        const socket = makeWASocket({
-            auth: {
-                creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, logger),
-            },
-            printQRInTerminal: false,
-            logger: logger,
-            browser: Browsers.ubuntu('Chrome'),
-            syncFullHistory: false,
-            connectTimeoutMs: 60_000
-        });
-
-        // Set response timeout
-        res.setTimeout(120000, () => {
-            if (!res.headersSent) {
-                res.status(504).json({ error: "Request timeout" });
-                socket.end(undefined);
-                removeFile(authDir);
-            }
-        });
-
-        socket.ev.on('creds.update', saveCreds);
-
-        socket.ev.on("connection.update", async (update) => {
-            const { connection, lastDisconnect } = update;
-            
-            if (connection === "open") {
-                logger.debug("Connection established");
-                
-                try {
-                    if (!socket.authState.creds.registered) {
-                        await delay(2000);
-                        const code = await socket.requestPairingCode(num);
-                        
-                        if (!res.headersSent) {
-                            return res.json({ 
-                                success: true,
-                                code: code,
-                                message: "Pairing code generated successfully"
-                            });
-                        }
-                    }
-
-                    // Session data handling
-                    const credsPath = path.join(authDir, 'creds.json');
-                    await delay(1000);
-                    
-                    if (fs.existsSync(credsPath)) {
-                        const data = fs.readFileSync(credsPath);
-                        const b64data = Buffer.from(data).toString('base64');
-                        
-                        const session = await socket.sendMessage(
-                            socket.user.id, 
-                            { text: b64data }
-                        );
-
-                        const successMessage = `
-*Pair Code Connected by Elite-Tech*
-*Made With ❤️*
+               let ELITE_TECH_TEXT = `
+*_Pair Code Connected by Elite-Tech_*
+*_Made With 🚬🗿_*
 ______________________________________
 ╔════◇
-║ *『 YOU'VE CHOSEN ELITE-TECH 』*
-║ WhatsApp Bot Deployment Started
+║ *『 AMAZING YOU'VE CHOSEN ELITE-TECH 』*
+║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
 ╚════════════════════════╝
 ╔═════◇
-║  『••• CONTACT & RESOURCES •••』
-║❒ *Owner:* https://wa.me/254743727510
-║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
-║❒ *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
-║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
+║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
+║❒ *Owner:* https://wa.me/254743727510_
+║❒ *Repo:* _https://github.com/Elite-Tech/elite-tech/_
+║❒ *WaChannel:* _https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
+║❒ *Plugins:* _https://github.com/Elite-Tech/elite-tech 
 ╚════════════════════════╝
-_____________________________________`;
+_____________________________________
 
-                        await socket.sendMessage(
-                            socket.user.id,
-                            { text: successMessage },
-                            { quoted: session }
-                        );
-                    }
+_Don't Forget To Give Star To My Repo_`
+ await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id,{text: ELITE_TECH_TEXT},{quoted:session})
+ 
 
-                } catch (innerError) {
-                    logger.error("Error in connection handling:", innerError);
-                    if (!res.headersSent) {
-                        res.status(500).json({ error: "Internal processing error" });
-                    }
-                } finally {
-                    await socket.end();
-                    await removeFile(authDir);
+        await delay(100);
+        await Pair_Code_By_Elite_Tech.ws.close();
+        return await removeFile('./temp/'+id);
+            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                    await delay(10000);
+                    ELITE_TECH_PAIR_CODE();
                 }
-                
-            } else if (connection === "close") {
-                logger.debug("Connection closed", lastDisconnect?.error);
-                
-                if (lastDisconnect?.error?.output?.statusCode !== 401) {
-                    await delay(10_000);
-                    await removeFile(authDir);
-                }
-            }
-        });
-
-    } catch (err) {
-        logger.error("Initialization failed:", err);
-        await removeFile(authDir);
-        
-        if (!res.headersSent) {
-            const status = err.message.includes('timeout') ? 504 : 500;
-            res.status(status).json({ 
-                error: "Failed to initialize pairing",
-                details: process.env.NODE_ENV === 'development' ? err.message : undefined
             });
+        } catch (err) {
+            console.log("service restated");
+            await removeFile('./temp/'+id);
+         if(!res.headersSent){
+            await res.send({code:"Service Unavailable"});
+         }
         }
     }
+    return await MASTERTECH_XD_PAIR_CODE()
 });
-
-module.exports = router;
+module.exports = router
