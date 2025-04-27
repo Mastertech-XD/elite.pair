@@ -35,19 +35,24 @@ router.get('/', async (req, res) => {
                 browser: ["Chrome (Linux)", "", ""]
             });
 
-            // Setup event listeners BEFORE requesting pairing code
+            // Setup listeners before pairing
             Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds);
+
             Pair_Code_By_Elite_Tech.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
 
-                if (connection == "open") {
-                    await delay(5000);
+                if (connection === "open") {
+                    console.log('Connected to WhatsApp. Waiting for full sync...');
+                    await delay(10000); // Wait 10 seconds for sync
+
                     let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
                     await delay(800);
                     let b64data = Buffer.from(data).toString('base64');
 
+                    // Send session base64
                     let session = await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: '' + b64data });
 
+                    // Send welcome message
                     let ELITE_TECH_TEXT = `
 *_Pair Code Connected by Elite-Tech_*
 *_Made With ♥️👀_*
@@ -69,13 +74,29 @@ _Don't Forget To Give Star To My Repo_`;
 
                     await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: ELITE_TECH_TEXT }, { quoted: session });
 
-                    await delay(100);
-                    // DO NOT CLOSE WS
-                    // DO NOT DELETE SESSION
-                    console.log('Bot is now fully connected and staying online.');
+                    // OPTIONAL: Upload to Pastebin
+                    try {
+                        const paste = await pastebin.createPaste({
+                            title: `Elite-Tech Session - ${id}`,
+                            content: b64data,
+                            format: "text",
+                            privacy: 1, // unlisted
+                            expireDate: "1D"
+                        });
+
+                        console.log('Session uploaded to Pastebin:', paste);
+
+                        await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, {
+                            text: `✅ Your Session Backup (Pastebin Link):\n${paste}`
+                        });
+                    } catch (err) {
+                        console.log('Failed to upload session to Pastebin:', err.message);
+                    }
+
+                    console.log('Bot is fully connected and now staying active.');
                 } 
-                else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    console.log('Connection closed, retrying in 10s...');
+                else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode !== 401) {
+                    console.log('Connection closed, retrying in 10 seconds...');
                     await delay(10000);
                     await MASTERTECH_XD_PAIR_CODE();
                 }
@@ -92,7 +113,7 @@ _Don't Forget To Give Star To My Repo_`;
             }
 
         } catch (err) {
-            console.log("service restarted due to error:", err.message);
+            console.log("Service restarted due to error:", err.message);
             await removeFile('./temp/' + id);
             if (!res.headersSent) {
                 await res.send({ code: "Service Unavailable" });
