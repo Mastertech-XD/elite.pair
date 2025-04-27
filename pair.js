@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-                browser: Browsers.macOS("Desktop")
+                browser: ["Chrome (Linux)", "", ""]
             });
 
             if (!Elite_Tech_Instance.authState.creds.registered) {
