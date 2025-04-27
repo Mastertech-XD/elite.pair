@@ -58,7 +58,7 @@ router.get('/', async (req, res) => {
 
                let ELITE_TECH_TEXT = `
 *_Pair Code Connected by Elite-Tech_*
-*_Made With 🚬🗿_*
+*_Made With ♥️👀_*
 ______________________________________
 ╔════◇
 ║ *『 AMAZING YOU'VE CHOSEN ELITE-TECH 』*
