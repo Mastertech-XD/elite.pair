@@ -4,448 +4,213 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pair Code</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    :root {
-      --primary-color: #6e3bdc;
-      --secondary-color: #c01736;
-      --accent-color: #8b17b6;
-      --text-color: #f1f1f1;
-      --bg-color: #0a0a0a;
-      --card-bg: rgba(20, 20, 20, 0.8);
-      --input-bg: #1a1a1a;
-      --success-color: #4CAF50;
-      --clock-color: #00ffaa;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
       margin: 0;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--text-color);
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(110, 59, 220, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(192, 23, 54, 0.15) 0%, transparent 50%);
-      z-index: -1;
+      background: black;
+      font-family: Arial, sans-serif;
     }
 
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 100%;
-      padding: 20px;
-      animation: fadeIn 0.8s ease-out;
     }
 
     .box {
-      width: 100%;
-      max-width: 380px;
-      padding: 30px;
-      text-align: center;
-      background-color: var(--card-bg);
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 300px;
+      height: 320px;
+      padding: 20px;
       position: relative;
-      overflow: hidden;
+      text-align: center;
+      background-color: rgb(0, 0, 0);
+      border-radius: 10px;
+      transform: perspective(1000px) rotateY(0deg);
+      box-shadow: 0 0 20px rgba(250, 249, 249, 0.7);
+      position: relative;
     }
 
-    .box:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    #text {
+      color: #f6f5f5;
     }
 
-    .box::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to bottom right,
-        transparent 45%,
-        rgba(110, 59, 220, 0.1) 50%,
-        transparent 55%
-      );
-      transform: rotate(30deg);
-      animation: shine 3s infinite;
+    .input-container input {
+      color: #f1eaea;
     }
 
-    .real-time-clock {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 0.9rem;
-      color: var(--clock-color);
-      font-family: 'Courier New', monospace;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 5px 10px;
-      border-radius: 5px;
-      border: 1px solid rgba(0, 255, 170, 0.3);
-      box-shadow: 0 0 10px rgba(0, 255, 170, 0.1);
-    }
-
-    @keyframes shine {
-      0% { transform: rotate(30deg) translate(-30%, -30%); }
-      100% { transform: rotate(30deg) translate(30%, 30%); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .logo {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      color: var(--primary-color);
-      text-shadow: 0 0 10px rgba(110, 59, 220, 0.5);
-    }
-
-    .title {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .subtitle {
-      font-size: 0.9rem;
-      margin-bottom: 25px;
-      color: rgba(255, 255, 255, 0.7);
+    .centered-text {
+      color: #e9e4e4;
     }
 
     .input-container {
       display: flex;
-      background: var(--input-bg);
-      border-radius: 12px;
-      padding: 5px;
-      gap: 5px;
+      background: rgb(10, 10, 10);
+      border-radius: 1rem;
+      background: black;
+      box-shadow: black;
+      padding: 0.3rem;
+      gap: 0.3rem;
+      max-width: 300px;
       width: 100%;
-      margin-bottom: 20px;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .input-container:focus-within {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(110, 59, 220, 0.3);
     }
 
     .input-container input {
-      border-radius: 8px;
-      background: var(--input-bg);
+      border-radius: 0.8rem 0 0 0.8rem;
+      background: #e8e8e8;
+      box-shadow: inset 13px 13px 10px #dcdcdc, inset -13px -13px 10px #f4f4f4;
       width: 100%;
-      padding: 15px;
+      flex-basis: 75%;
+      padding: 1rem;
       border: none;
-      color: var(--text-color);
-      font-size: 1rem;
-      transition: all 0.3s ease;
+      border-left: 2px solid #ecf2f8;
+      color: #000000;
+      transition: all 0.2s ease-in-out;
     }
 
     .input-container input:focus {
+      border-left: 2px solid #ecf1f6;
       outline: none;
-      background: #222;
-    }
-
-    .input-container input::placeholder {
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 0.9rem;
+      box-shadow: inset 13px 13px 10px #f0f2f3, inset -13px -13px 10px #f4f4f4;
     }
 
     .input-container button {
-      padding: 15px;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-      font-weight: 600;
-      letter-spacing: 0.1rem;
+      flex-basis: 15%;
+      padding: 1rem;
+      background: #5935ac;
+      font-weight: 700;
+      letter-spacing: 0.3rem;
       text-transform: uppercase;
       color: white;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-      white-space: nowrap;
+      width: 90%;
+      border-radius: 0 1rem 1rem 0;
+      transition: all 0.2s ease-in-out;
     }
 
     .input-container button:hover {
-      background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
-      transform: translateY(-2px);
+      background: linear-gradient(135deg, #c01736 0%, #8b17b6 100%);
     }
 
-    .input-container button:active {
-      transform: translateY(0);
+    @media (max-width: 500px) {
+      .input-container {
+        flex-direction: column;
+      }
+
+      .input-container input {
+        border-radius: 0.8rem;
+      }
+
+      .input-container button {
+        padding: 0.4rem;
+        border-radius: 0.8rem;
+      }
     }
 
-    .result-container {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.3);
-      display: none;
-    }
-
-    .copy-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-color);
-      font-size: 1rem;
-      font-weight: bold;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin: 0 auto;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .copy-btn i {
-      font-size: 0.9rem;
-    }
-
-    .footer {
-      margin-top: 30px;
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.5);
+    .centered-text {
       text-align: center;
-    }
-
-    .floating-particles {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: -1;
-    }
-
-    .particle {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-      animation: float linear infinite;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
     }
 
     @media (max-width: 500px) {
       .box {
-        padding: 25px 20px;
+        width: 90%; 
       }
-      
-      .input-container {
-        flex-direction: column;
-      }
-      
+    }
+
+    @media (max-width: 500px) {
       .input-container input {
-        margin-bottom: 5px;
-      }
-      
-      .title {
-        font-size: 1.5rem;
+        border-radius: 0.8rem;
+        width: 80%; 
       }
 
-      .real-time-clock {
-        font-size: 0.8rem;
-        top: 10px;
-        right: 10px;
+      .input-container button {
+        padding: 1rem;
+        border-radius: 0.9rem;
+        width: 100%; 
       }
     }
   </style>
 </head>
 <body>
-  <div class="floating-particles" id="particles"></div>
   <div class="container">
-    <div class="box" id="box">
-      <div class="real-time-clock" id="clock"></div>
-      <div class="logo">
-        <i class="fas fa-code"></i>
-      </div>
-      <h1 class="title">PAIRING CODE</h1>
-      <p class="subtitle">Enter your WhatsApp number with country code to generate your pairing code</p>
-      
-      <form id="numberForm" class="input-container">
-        <input type="tel" id="number" name="phoneNumber" placeholder="e.g. 25474372××××" inputmode="tel" required>
-        <button type="submit" id="submit">SUBMIT</button>
-      </form>
-      
-      <div class="result-container" id="result">
-        <button class="copy-btn" id="copy">
-          <i class="fas fa-copy"></i>
-          <span id="code-text">COPY CODE</span>
-        </button>
-      </div>
-      
-      <div class="footer">
-        <p>Made with <i class="fas fa-heart" style="color: var(--secondary-color);"></i> by MASTERTECH ELITE</p>
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user"></i>
+          <p>
+            <h3 class="centered-text">PAIRING CODE</h3>
+            <br>
+            <h6>Made By MASTERTECH ELITE 🗽.</h6>
+            <h6>Enter Your Number with Country Code.</h6>
+            <div class="input-container">
+              <input placeholder="25474372××××" type="number" id="number" placeholder="Mf Enter your Phone Pumber with Cuntry Code" name="">
+              <button id="submit">Submit</button>
+            </div>
+            
+            <a id="waiting-message" class="centered-text" style="display: none;">Please wait a while</a>
+            <br>
+            <br>
+            <main id="pair"></main>
+          </p>
+        </div>
       </div>
     </div>
   </div>
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    // Create floating particles
-    const particlesContainer = document.getElementById('particles');
-    const particleCount = 30;
-    
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.classList.add('particle');
-      
-      // Random size between 1px and 3px
-      const size = Math.random() * 2 + 1;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      
-      // Random position
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.bottom = `-10px`;
-      
-      // Random animation duration
-      const duration = Math.random() * 20 + 10;
-      particle.style.animationDuration = `${duration}s`;
-      
-      // Random delay
-      particle.style.animationDelay = `${Math.random() * 10}s`;
-      
-      particlesContainer.appendChild(particle);
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+    let box = document.getElementById("box");
+
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:blue;font-weight:bold";
+      obj.size = "5";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:white;font-weight-bold";
+        obj.size = "5";
+      }, 500);
     }
 
-    // Real-time clock function
-    function updateClock() {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      const timeString = `${hours}:${minutes}:${seconds}`;
-      document.getElementById('clock').textContent = timeString;
-    }
-
-    // Update clock immediately and then every second
-    updateClock();
-    setInterval(updateClock, 1000);
-
-    // Main functionality
-    const resultContainer = document.getElementById("result");
-    const copyBtn = document.getElementById("copy");
-    const codeText = document.getElementById("code-text");
-    const numberForm = document.getElementById("numberForm");
-    const numberInput = document.getElementById("number");
-    const box = document.getElementById("box");
-
-    async function copyToClipboard() {
-      const code = codeText.innerText.replace('CODE: ', '');
-      try {
-        await navigator.clipboard.writeText(code);
-        codeText.innerHTML = '<span style="color: var(--success-color);">COPIED!</span>';
-        setTimeout(() => {
-          codeText.innerHTML = `CODE: <span style="color: white;">${code}</span>`;
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy: ', err);
-      }
-    }
-
-    numberForm.addEventListener("submit", async (e) => {
+    b.addEventListener("click", async (e) => {
       e.preventDefault();
-      
-      if (!numberInput.value) {
-        showResult('Please enter your WhatsApp number', 'error');
-        return;
-      }
-      
-      // Remove all non-digit characters
-      const cleanNumber = numberInput.value.replace(/\D/g, "");
-      
-      if (cleanNumber.length < 11) {
-        showResult('Invalid number format (too short)', 'error');
-        return;
-      }
-      
-      // Format the number for display (optional)
-      const formattedNumber = `+${cleanNumber.substring(0, 3)} ${cleanNumber.substring(3, 5)} ${cleanNumber.substring(5, 8)} ${cleanNumber.substring(8)}`;
-      numberInput.value = formattedNumber;
-      
-      showResult('Generating code...', 'loading');
-      
-      try {
-        // Simulate API call (replace with actual API call)
-        // const { data } = await axios.get(`/code?number=${cleanNumber}`);
-        // const code = data.code || "Service Unavailable";
-        
-        // For demo purposes, generate a random code
-        const randomCode = Math.floor(100000 + Math.random() * 900000);
-        setTimeout(() => {
-          showResult(`CODE: <span style="color: white;">${randomCode}</span>`, 'success');
-        }, 1500);
-      } catch (error) {
-        console.error('Error:', error);
-        showResult('Failed to generate code', 'error');
+      if (!c.value) {
+        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:red;font-weight:bold">Invalid Number</a><br><br>';
+      } else {
+        const Wasi_Tech = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+        const cc = Wasi_Tech.split('');
+        cc.map(a => {
+          bbc += a;
+          if (bbc.length == 3) {
+            bb += " " + a;
+          } else if (bbc.length == 8) {
+            bb += " " + a;
+          } else {
+            bb += a;
+          }
+        });
+        c.type = "text";
+        c.value = "+" + bb;
+        c.style = "color:black;font-size:20px";
+        a.innerHTML = '<a style="color:white;font-weight:bold">Please Wait...</a><br><br>';
+        let { data } = await axios(`/code?number=${Wasi_Tech}`);
+        let code = data.code || "Service Unavailable";
+        a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">' + code + '</span></font><br><br><br>';
       }
     });
-
-    function showResult(message, type) {
-      resultContainer.style.display = 'block';
-      codeText.innerHTML = message;
-      
-      // Reset all classes
-      resultContainer.className = 'result-container';
-      copyBtn.style.display = 'none';
-      
-      // Add appropriate class based on type
-      if (type === 'error') {
-        resultContainer.classList.add('error');
-        copyBtn.style.display = 'none';
-      } else if (type === 'loading') {
-        resultContainer.classList.add('loading');
-        copyBtn.style.display = 'none';
-      } else if (type === 'success') {
-        resultContainer.classList.add('success');
-        copyBtn.style.display = 'flex';
-        copyBtn.addEventListener('click', copyToClipboard);
-      }
-    }
   </script>
 </body>
 </html>
