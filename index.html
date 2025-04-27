@@ -63,7 +63,7 @@
       font-family: 'Orbitron', sans-serif;
       color: var(--neon-green);
       text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
       letter-spacing: 3px;
       animation: pulse 2s infinite alternate;
       position: relative;
@@ -92,7 +92,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.5rem;
-      padding: 2rem;
+      padding: 1rem;
       max-width: 900px;
       width: 90%;
       z-index: 1;
@@ -119,6 +119,125 @@
       backdrop-filter: blur(5px);
     }
     
+    /* Music player section */
+    .music-player {
+      width: 90%;
+      max-width: 600px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      z-index: 1;
+    }
+    
+    .music-player h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-blue);
+      text-shadow: 0 0 8px var(--neon-blue);
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    
+    .track-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .track-item {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      background: rgba(10, 10, 25, 0.5);
+      border-radius: 6px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+    
+    .track-item:hover {
+      background: rgba(20, 20, 40, 0.7);
+      border-left: 3px solid var(--neon-green);
+      transform: translateX(5px);
+    }
+    
+    .track-number {
+      color: var(--neon-pink);
+      font-family: 'Orbitron', sans-serif;
+      margin-right: 1rem;
+      width: 2rem;
+      text-align: center;
+      text-shadow: 0 0 5px var(--neon-pink);
+    }
+    
+    .track-link {
+      color: white;
+      text-decoration: none;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    
+    .track-link:hover {
+      color: var(--neon-green);
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+    
+    .track-icon {
+      margin-right: 0.8rem;
+      font-size: 1.2rem;
+    }
+    
+    .now-playing {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(0, 20, 30, 0.6);
+      border-radius: 8px;
+      border: 1px solid var(--neon-blue);
+      text-align: center;
+    }
+    
+    .now-playing.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    
+    .now-playing-title {
+      color: var(--neon-green);
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 0.5rem;
+    }
+    
+    audio {
+      width: 100%;
+      margin-top: 0.5rem;
+      filter: drop-shadow(0 0 5px var(--neon-blue));
+    }
+    
+    audio::-webkit-media-controls-panel {
+      background: linear-gradient(to right, #0a0a20, #0a1a2a);
+      border-radius: 0;
+    }
+    
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-mute-button {
+      background-color: var(--neon-blue);
+      border-radius: 50%;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Rest of your existing styles... */
     .btn::before {
       content: '';
       position: absolute;
@@ -286,11 +405,15 @@
       body {
         background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
       }
+      
+      .music-player {
+        padding: 1rem;
+      }
     }
     
     /* Footer */
     .footer {
-      margin-top: 2rem;
+      margin-top: 1rem;
       font-size: 0.8rem;
       color: rgba(255, 255, 255, 0.6);
       text-align: center;
@@ -365,24 +488,55 @@
       <div class="corner bottom-left"></div>
       <div class="corner bottom-right"></div>
     </button>
+  </div>
+  
+  <!-- Music Player Section -->
+  <div class="music-player">
+    <h2>SOUNDTRACKS</h2>
+    <ul class="track-list">
+      <li class="track-item" data-src="https://files.catbox.moe/utbujd.mp3">
+        <span class="track-number">01</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 1: utbujd.mp3', 'https://files.catbox.moe/utbujd.mp3')">
+          <span class="track-icon">🎵</span>
+          <span>utbujd.mp3</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/w2j17k.m4a">
+        <span class="track-number">02</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 2: w2j17k.m4a', 'https://files.catbox.moe/w2j17k.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>w2j17k.m4a</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/851skv.m4a">
+        <span class="track-number">03</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 3: 851skv.m4a', 'https://files.catbox.moe/851skv.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>851skv.m4a</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/qnhtbu.m4a">
+        <span class="track-number">04</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 4: qnhtbu.m4a', 'https://files.catbox.moe/qnhtbu.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>qnhtbu.m4a</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/lb0x7w.mp3">
+        <span class="track-number">05</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 5: lb0x7w.mp3', 'https://files.catbox.moe/lb0x7w.mp3')">
+          <span class="track-icon">🎵</span>
+          <span>lb0x7w.mp3</span>
+        </a>
+      </li>
+    </ul>
     
-    <button onclick="window.open('https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D')" class="btn">
-      <span class="btn-text"><span class="btn-icon">👥</span> Wa Group</span>
-      <div class="glow-effect"></div>
-      <div class="corner top-left"></div>
-      <div class="corner top-right"></div>
-      <div class="corner bottom-left"></div>
-      <div class="corner bottom-right"></div>
-    </button>
-    
-    <button onclick="window.open('https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D')" class="btn">
-      <span class="btn-text"><span class="btn-icon">📢</span> Wa Channel</span>
-      <div class="glow-effect"></div>
-      <div class="corner top-left"></div>
-      <div class="corner top-right"></div>
-      <div class="corner bottom-left"></div>
-      <div class="corner bottom-right"></div>
-    </button>
+    <div class="now-playing" id="nowPlaying">
+      <div class="now-playing-title" id="nowPlayingTitle"></div>
+      <audio controls id="audioPlayer">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
   </div>
   
   <div class="particles" id="particles-js"></div>
@@ -397,12 +551,11 @@
       const particlesContainer = document.getElementById('particles-js');
       const colors = ['#0ff', '#08f', '#80f', '#f0f', '#ff0', '#f80'];
       
-      for (let i = 0; i < 30; i++) { // Reduced number of particles for better visibility
+      for (let i = 0; i < 30; i++) {
         const particle = document.createElement('div');
         particle.classList.add('particle');
         
-        // Random properties
-        const size = Math.random() * 4 + 1; // Smaller particles
+        const size = Math.random() * 4 + 1;
         const posX = Math.random() * window.innerWidth;
         const posY = Math.random() * window.innerHeight + window.innerHeight;
         const duration = Math.random() * 20 + 10;
@@ -453,6 +606,32 @@
         document.querySelector('.video-background').style.display = 'none';
       });
     });
+    
+    // Music player functionality
+    function playTrack(event, title, src) {
+      event.preventDefault();
+      
+      const audioPlayer = document.getElementById('audioPlayer');
+      const nowPlaying = document.getElementById('nowPlaying');
+      const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+      
+      // Update the player
+      nowPlayingTitle.textContent = title;
+      audioPlayer.src = src;
+      nowPlaying.classList.add('active');
+      
+      // Play the track
+      audioPlayer.play().catch(e => {
+        console.log("Audio play prevented:", e);
+        // Show a message if autoplay is blocked
+        nowPlayingTitle.textContent = "Click the play button to start";
+      });
+      
+      // Highlight the playing track
+      document.querySelectorAll('.track-item').forEach(item => {
+        item.style.borderLeft = item.dataset.src === src ? '3px solid var(--neon-green)' : '3px solid transparent';
+      });
+    }
   </script>
 </body>
 </html>
