@@ -15,6 +15,7 @@
       --card-bg: rgba(20, 20, 20, 0.8);
       --input-bg: #1a1a1a;
       --success-color: #4CAF50;
+      --clock-color: #00ffaa;
     }
 
     * {
@@ -93,6 +94,20 @@
       );
       transform: rotate(30deg);
       animation: shine 3s infinite;
+    }
+
+    .real-time-clock {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 0.9rem;
+      color: var(--clock-color);
+      font-family: 'Courier New', monospace;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 170, 0.1);
     }
 
     @keyframes shine {
@@ -277,6 +292,12 @@
       .title {
         font-size: 1.5rem;
       }
+
+      .real-time-clock {
+        font-size: 0.8rem;
+        top: 10px;
+        right: 10px;
+      }
     }
   </style>
 </head>
@@ -284,6 +305,7 @@
   <div class="floating-particles" id="particles"></div>
   <div class="container">
     <div class="box" id="box">
+      <div class="real-time-clock" id="clock"></div>
       <div class="logo">
         <i class="fas fa-code"></i>
       </div>
@@ -336,6 +358,20 @@
       
       particlesContainer.appendChild(particle);
     }
+
+    // Real-time clock function
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const timeString = `${hours}:${minutes}:${seconds}`;
+      document.getElementById('clock').textContent = timeString;
+    }
+
+    // Update clock immediately and then every second
+    updateClock();
+    setInterval(updateClock, 1000);
 
     // Main functionality
     const resultContainer = document.getElementById("result");
