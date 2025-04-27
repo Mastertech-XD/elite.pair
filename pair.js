@@ -1,4 +1,4 @@
-const PastebinAPI = require('pastebin-js'),
+PastebinAPI = require('pastebin-js'),
 pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
 const {makeid} = require('./id');
 const express = require('express');
@@ -6,7 +6,7 @@ const fs = require('fs');
 let router = express.Router()
 const pino = require("pino");
 const {
-    default: Gifted_Tech,
+    default: Elite_Tech,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
@@ -20,13 +20,13 @@ function removeFile(FilePath){
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-        async function GIFTED_MD_PAIR_CODE() {
+        async function ELITE_XD_PAIR_CODE() {
         const {
             state,
             saveCreds
         } = await useMultiFileAuthState('./temp/'+id)
      try {
-            let Pair_Code_By_Gifted_Tech = Gifted_Tech({
+            let Pair_Code_By_ELITE_TECH = ELITE_TECH({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
@@ -35,16 +35,16 @@ router.get('/', async (req, res) => {
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
                 browser: ["Chrome (Linux)", "", ""]
              });
-             if(!Pair_Code_By_Gifted_Tech.authState.creds.registered) {
+             if(!Pair_Code_By_ELITE_TECH.authState.creds.registered) {
                 await delay(1500);
                         num = num.replace(/[^0-9]/g,'');
-                            const code = await Pair_Code_By_Gifted_Tech.requestPairingCode(num)
+                            const code = await Pair_Code_By_ELITE_TECH.requestPairingCode(num)
                  if(!res.headersSent){
                  await res.send({code});
                      }
                  }
-            Pair_Code_By_Gifted_Tech.ev.on('creds.update', saveCreds)
-            Pair_Code_By_Gifted_Tech.ev.on("connection.update", async (s) => {
+            Pair_Code_By_ELITE_TECH.ev.on('creds.update', saveCreds)
+            Pair_Code_By_ELITE_TECH.ev.on("connection.update", async (s) => {
                 const {
                     connection,
                     lastDisconnect
@@ -54,35 +54,42 @@ router.get('/', async (req, res) => {
                 let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
                 await delay(800);
                let b64data = Buffer.from(data).toString('base64');
-               let session = await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id, { text: '' + b64data });
+               let session = await Pair_Code_By_ELITE_TECH.sendMessage(Pair_Code_By_ELITE_TECH.user.id, { text: '' + b64data });
 
-               let GIFTED_MD_TEXT = `
-               *Pair Code Connected by Elite-Tech*
-               *Made With ❤️*
-               ______________________________________
-               ╔════════════◇═══════════
-               ║ *『 YOU'VE CHOSEN ELITE-TECH 』*
-               ║ WhatsApp Bot Deployment Started
-               ╚════════════════════════╝
-               ╔════════════◇════════════
-               ║  『••• CONTACT & RESOURCES •••』        
-               ║❒ *Owner:* https://wa.me/254743727510
-               ║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
-               ║❒ *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
-               ║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
-               ╚════════════════════════╝
-               _____________________________________`;
+               let ELITE_XD_TEXT = `
+*ELITE_XD*
+*MASTERTECH_XD BOT*
+*𝙇𝙀𝙂𝙄𝙏 𝘽𝙊𝙏*
+____________________________________
+╔════◇
+║『 𝘿𝙀𝙑𝙀𝙇𝙊𝙋𝙀𝙍』
 
-                    _Don't Forget To Give Star To My Repo_`
-                        await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
+║ ❒ MASTERPEACE: _https://wa.link/1eyv9w_
+
+╚════════════════════❒
+╔═════◇
+║ 『••• OWNER INFO •••』
+║ ❒ 𝐘𝐨𝐮𝐭𝐮𝐛𝐞: _https://www.youtube.com/Masterpeace_
+
+║ ❒ 𝐎𝐰𝐧𝐞𝐫: _https://wa.link/1eyv9w_
+
+║ ❒ 𝐖𝐚𝐂𝐡𝐚𝐧𝐧𝐞𝐥: _https://whatsapp.com/channel/0029VafeCKHKmCPMtW3bFA08_
+
+║ 
+╚════════════════════╝ 
+ *ELITE_MDX*
+___________________________________
+
+Don't Forget To Give Star To My Repo`
+ await Pair_Code_By_ELITE_TECH.sendMessage(Pair_Code_By_ELITE_TECH.user.id,{text: ELITE_XD_TEXT},{quoted:session})
  
 
         await delay(100);
-        await Pair_Code_By_Gifted_Tech.ws.close();
+        await Pair_Code_By_ELITE_TECH.ws.close();
         return await removeFile('./temp/'+id);
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    GIFTED_MD_PAIR_CODE();
+                    ELITE_XD_PAIR_CODE();
                 }
             });
         } catch (err) {
@@ -93,6 +100,6 @@ router.get('/', async (req, res) => {
          }
         }
     }
-    return await GIFTED_MD_PAIR_CODE()
+    return await ELITE_XD_PAIR_CODE()
 });
 module.exports = router
