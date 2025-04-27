@@ -1,9 +1,9 @@
-const PastebinAPI = require('pastebin-js'),
-pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep')
-const {makeid} = require('./id');
+const PastebinAPI = require('pastebin-js');
+const pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep'); // Remove or secure this API key
+const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
-let router = express.Router()
+const router = express.Router();
 const pino = require("pino");
 const {
     default: Elite_Tech,
@@ -13,86 +13,93 @@ const {
     Browsers
 } = require("maher-zubair-baileys");
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
- };
+function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
+}
+
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-        async function MASTERTECH_XD_PAIR_CODE() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/'+id)
-     try {
-            let Pair_Code_By_Elite_Tech = Elite_Tech({
+
+    async function ELITE_TECH_PAIR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState(`./temp/${id}`);
+        
+        try {
+            const Elite_Tech_Instance = Elite_Tech({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
                 },
                 printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: ["Chrome (Linux)", "", ""]
-             });
-             if(!Pair_Code_By_Elite_Tech.authState.creds.registered) {
-                await delay(1500);
-                        num = num.replace(/[^0-9]/g,'');
-                            const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num)
-                 if(!res.headersSent){
-                 await res.send({code});
-                     }
-                 }
-            Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds)
-            Pair_Code_By_Elite_Tech.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect
-                } = s;
-                if (connection == "open") {
-                await delay(5000);
-                let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                await delay(800);
-               let b64data = Buffer.from(data).toString('base64');
-               let session = await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: '' + b64data });
+                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                browser: Browsers.macOS("Desktop")
+            });
 
-               let ELITE_TECH_TEXT = `
+            if (!Elite_Tech_Instance.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g, '');
+                const code = await Elite_Tech_Instance.requestPairingCode(num);
+                
+                if (!res.headersSent) {
+                    await res.send({ code });
+                }
+            }
+
+            Elite_Tech_Instance.ev.on('creds.update', saveCreds);
+            Elite_Tech_Instance.ev.on("connection.update", async (s) => {
+                const { connection, lastDisconnect } = s;
+                
+                if (connection === "open") {
+                    await delay(5000);
+                    const data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                    await delay(800);
+                    const b64data = Buffer.from(data).toString('base64');
+                    const session = await Elite_Tech_Instance.sendMessage(Elite_Tech_Instance.user.id, { text: b64data });
+
+                    const ELITE_TECH_TEXT = `
 *_Pair Code Connected by Elite-Tech_*
-*_Made With 🚬🗿_*
+*_Made With ❤️_*
 ______________________________________
 ╔════◇
-║ *『 AMAZING YOU'VE CHOSEN ELITE-TECH-XD』*
-║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
+║ *『 YOU\'VE CHOSEN ELITE-TECH 』*
+║ _WhatsApp Bot Deployment Started_
 ╚════════════════════════╝
 ╔═════◇
-║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
-║❒ *Owner:* https://wa.me/254743727510_
-║❒ *Repo:* _https://github.com/Elite-Tech/elite-tech/_
-║❒ *WaChannel:* _https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
-║❒ *Plugins:* _https://github.com/Elite-Tech/elite-tech 
+║  『••• CONTACT & RESOURCES •••』
+║❒ *Owner:* https://wa.me/254743727510
+║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
+║❒ *Channel:* https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
+║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
 ╚════════════════════════╝
 _____________________________________
 
-_Don't Forget To Give Star To My Repo_`
- await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id,{text: ELITE_TECH_TEXT},{quoted:session})
- 
+_Don't Forget To Star Our Repositories_`;
 
-        await delay(100);
-        await Pair_Code_By_Elite_Tech.ws.close();
-        return await removeFile('./temp/'+id);
-            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                    await Elite_Tech_Instance.sendMessage(
+                        Elite_Tech_Instance.user.id,
+                        { text: ELITE_TECH_TEXT },
+                        { quoted: session }
+                    );
+
+                    await delay(100);
+                    await Elite_Tech_Instance.ws.close();
+                    return removeFile(`./temp/${id}`);
+                } else if (connection === "close" && lastDisconnect?.error?.output.statusCode !== 401) {
                     await delay(10000);
                     ELITE_TECH_PAIR_CODE();
                 }
             });
         } catch (err) {
-            console.log("service restated");
-            await removeFile('./temp/'+id);
-         if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
-         }
+            console.error("Service error:", err);
+            await removeFile(`./temp/${id}`);
+            if (!res.headersSent) {
+                await res.status(503).send({ code: "Service Unavailable" });
+            }
         }
     }
-    return await MASTERTECH_XD_PAIR_CODE()
+
+    return ELITE_TECH_PAIR_CODE();
 });
-module.exports = router
+
+module.exports = router;
