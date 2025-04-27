@@ -2,442 +2,208 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WhatsApp Session Code | MASTERTECH-ELITE</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pair Code - MasterTech Elite</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    :root {
-      --primary: #6c5ce7;
-      --secondary: #a29bfe;
-      --accent: #fd79a8;
-      --dark: #2d3436;
-      --light: #f5f6fa;
-      --success: #00b894;
-      --warning: #fdcb6e;
-      --danger: #d63031;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
     body {
-      font-family: 'Poppins', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
-      color: var(--light);
-      padding: 20px;
+      margin: 0;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow: hidden;
     }
-    
+
     .container {
-      width: 100%;
-      max-width: 500px;
-      animation: fadeIn 0.5s ease-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 1s ease-in;
     }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .card {
+
+    .box {
+      width: 340px;
+      padding: 30px 25px;
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-    
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
-    
-    .logo {
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
       text-align: center;
-      margin-bottom: 25px;
+      transition: transform 0.3s ease;
     }
-    
-    .logo h1 {
-      font-size: 1.8rem;
-      background: linear-gradient(to right, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      font-weight: 700;
-      letter-spacing: 1px;
+
+    .box:hover {
+      transform: scale(1.03);
     }
-    
-    .logo p {
-      font-size: 0.9rem;
-      color: var(--secondary);
-      margin-top: 5px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .input-field {
-      position: relative;
-      margin-bottom: 25px;
-    }
-    
-    .input-field input {
-      width: 100%;
-      padding: 15px 20px;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--light);
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      border-left: 3px solid transparent;
-    }
-    
-    .input-field input:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.15);
-      border-left: 3px solid var(--accent);
-      box-shadow: 0 0 10px rgba(253, 121, 168, 0.3);
-    }
-    
-    .input-field input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-    
-    .input-field i {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--secondary);
-    }
-    
-    .btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-    }
-    
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
-    }
-    
-    .btn:active {
-      transform: translateY(0);
-    }
-    
-    .btn:disabled {
-      background: rgba(255, 255, 255, 0.1);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .result-container {
-      margin-top: 30px;
-      text-align: center;
-      display: none;
-    }
-    
-    .code-display {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 15px;
-      border-radius: 10px;
-      margin: 20px 0;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-    
-    .code-display:hover {
-      background: rgba(0, 0, 0, 0.4);
-    }
-    
-    .code {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--light);
+
+    .box h3 {
       margin: 10px 0;
+      font-size: 24px;
+      color: #fff;
     }
-    
-    .copy-btn {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--light);
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      margin-top: 10px;
+
+    .box h6 {
+      font-weight: normal;
+      font-size: 14px;
+      color: #ccc;
+      margin: 5px 0;
     }
-    
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .copy-btn.copied {
-      background: var(--success);
-      color: white;
-    }
-    
-    .status {
+
+    .input-container {
       margin-top: 20px;
-      font-size: 0.9rem;
-      color: var(--secondary);
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      width: 100%;
     }
-    
-    .instructions {
-      margin-top: 30px;
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
+
+    .input-container input {
+      border: none;
+      outline: none;
+      padding: 15px;
+      background: none;
+      color: #fff;
+      width: 75%;
+      font-size: 16px;
     }
-    
-    .instructions h3 {
-      color: var(--secondary);
-      margin-bottom: 10px;
-      font-size: 1rem;
+
+    .input-container input::placeholder {
+      color: #ccc;
     }
-    
-    .instructions ol {
-      padding-left: 20px;
+
+    .input-container button {
+      width: 25%;
+      background: #ff416c;
+      background: linear-gradient(to right, #ff4b2b, #ff416c);
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: 0.3s;
     }
-    
-    .instructions li {
-      margin-bottom: 8px;
+
+    .input-container button:hover {
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
     }
-    
-    .error-message {
-      color: var(--danger);
-      font-size: 0.9rem;
-      margin-top: 5px;
-      text-align: center;
-      display: none;
+
+    #waiting-message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ccc;
     }
-    
-    .loading {
-      display: none;
-      text-align: center;
-      margin: 20px 0;
+
+    #pair {
+      margin-top: 15px;
+      font-size: 18px;
     }
-    
-    .spinner {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      border-top: 4px solid var(--accent);
-      animation: spin 1s linear infinite;
+
+    #copy {
+      cursor: pointer;
+      transition: 0.2s;
     }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+
+    #copy:hover {
+      color: #00ffe7;
     }
-    
-    .footer {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.5);
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    
-    @media (max-width: 576px) {
-      .card {
+
+    @media (max-width: 500px) {
+      .box {
+        width: 90%;
         padding: 20px;
       }
-      
-      .logo h1 {
-        font-size: 1.5rem;
+
+      .input-container {
+        flex-direction: column;
       }
-      
-      .input-field input {
-        padding: 12px 15px;
+
+      .input-container input, .input-container button {
+        width: 100%;
       }
-      
-      .btn {
-        padding: 12px;
+
+      .input-container button {
+        margin-top: 10px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <div class="card">
-      <div class="logo">
-        <h1>MASTERTECH-ELITE</h1>
-        <p>WhatsApp Session Code Generator</p>
+    <div class="box" id="box">
+      <i class="fa fa-user fa-2x"></i>
+      <h3>PAIRING CODE</h3>
+      <h6>Made by MASTERTECH ELITE 🗽</h6>
+      <h6>Enter Your Number with Country Code</h6>
+      <div class="input-container">
+        <input placeholder="25474372××××" type="number" id="number">
+        <button id="submit">Submit</button>
       </div>
-      
-      <div class="form-group">
-        <div class="input-field">
-          <input type="tel" id="phoneNumber" placeholder="Enter WhatsApp number with country code (e.g. 254712345678)" autocomplete="off">
-          <i class="fas fa-phone-alt"></i>
-        </div>
-        <div class="error-message" id="errorMessage"></div>
-      </div>
-      
-      <button class="btn" id="generateBtn">Generate Session Code</button>
-      
-      <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>Generating your session code...</p>
-      </div>
-      
-      <div class="result-container" id="resultContainer">
-        <h3>Your WhatsApp Session Code</h3>
-        <div class="code-display">
-          <p class="code" id="sessionCode"></p>
-          <button class="copy-btn" id="copyBtn">Copy Code</button>
-        </div>
-        <p class="status">Code will expire in 24 hours</p>
-      </div>
-      
-      <div class="instructions">
-        <h3>How to use this code:</h3>
-        <ol>
-          <li>Enter your WhatsApp number with country code</li>
-          <li>Click "Generate Session Code"</li>
-          <li>Copy the generated code</li>
-          <li>Use it in your WhatsApp automation setup</li>
-          <li>The code will be valid for 24 hours</li>
-        </ol>
-      </div>
-    </div>
-    
-    <div class="footer">
-      <p>© 2023 MASTERTECH-ELITE. All rights reserved.</p>
+      <a id="waiting-message" style="display: none;">Please wait a while...</a>
+      <main id="pair"></main>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const phoneInput = document.getElementById('phoneNumber');
-      const generateBtn = document.getElementById('generateBtn');
-      const loading = document.getElementById('loading');
-      const resultContainer = document.getElementById('resultContainer');
-      const sessionCode = document.getElementById('sessionCode');
-      const copyBtn = document.getElementById('copyBtn');
-      const errorMessage = document.getElementById('errorMessage');
-      
-      // Format phone number as user types
-      phoneInput.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        if (value.length > 0) {
-          value = '+' + value;
-        }
-        
-        e.target.value = value;
-      });
-      
-      // Generate session code
-      generateBtn.addEventListener('click', async function() {
-        const phoneNumber = phoneInput.value.replace(/\D/g, '');
-        
-        // Validate input
-        if (!phoneNumber) {
-          showError('Please enter a WhatsApp number');
-          return;
-        }
-        
-        if (phoneNumber.length < 8) {
-          showError('Please enter a valid phone number with country code');
-          return;
-        }
-        
-        // Clear any previous errors
-        hideError();
-        
-        // Show loading state
-        generateBtn.disabled = true;
-        loading.style.display = 'block';
-        resultContainer.style.display = 'none';
-        
-        try {
-          // Simulate API call (replace with your actual API endpoint)
-          // const response = await axios.get(`/code?number=${phoneNumber}`);
-          // const code = response.data.code || "Service Unavailable";
-          
-          // For demo purposes, we'll generate a random code
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          const code = generateRandomCode(12);
-          
-          // Display result
-          sessionCode.textContent = code;
-          resultContainer.style.display = 'block';
-          
-          // Reset button state
-          generateBtn.disabled = false;
-          loading.style.display = 'none';
-          
-        } catch (error) {
-          showError('Failed to generate code. Please try again.');
-          generateBtn.disabled = false;
-          loading.style.display = 'none';
-          console.error('Error:', error);
-        }
-      });
-      
-      // Copy code to clipboard
-      copyBtn.addEventListener('click', function() {
-        const code = sessionCode.textContent;
-        navigator.clipboard.writeText(code).then(function() {
-          copyBtn.textContent = 'Copied!';
-          copyBtn.classList.add('copied');
-          
-          setTimeout(function() {
-            copyBtn.textContent = 'Copy Code';
-            copyBtn.classList.remove('copied');
-          }, 2000);
-        }).catch(function(err) {
-          console.error('Could not copy text: ', err);
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED!";
+      obj.style.color = "lime";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style.color = "red";
+      }, 800);
+    }
+
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!c.value) {
+        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:red;font-weight:bold">Invalid Number</a><br><br>';
+      } else {
+        const Wasi_Tech = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+        const cc = Wasi_Tech.split('');
+        cc.map(a => {
+          bbc += a;
+          if (bbc.length == 3 || bbc.length == 8) {
+            bb += " " + a;
+          } else {
+            bb += a;
+          }
         });
-      });
-      
-      // Helper functions
-      function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-      }
-      
-      function hideError() {
-        errorMessage.style.display = 'none';
-      }
-      
-      function generateRandomCode(length) {
-        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let result = '';
-        
-        for (let i = 0; i < length; i++) {
-          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        c.type = "text";
+        c.value = "+" + bb;
+        c.style.color = "white";
+        c.style.fontSize = "18px";
+        a.innerHTML = '<a style="color:white;font-weight:bold">Please Wait...</a><br><br>';
+        try {
+          let { data } = await axios(`/code?number=${Wasi_Tech}`);
+          let code = data.code || "Service Unavailable";
+          a.innerHTML = `<font id="copy" onclick="Copy()" style="color:red;font-weight:bold;cursor:pointer;">CODE: <span style="color:white;">${code}</span></font><br><br><br>`;
+        } catch (err) {
+          a.innerHTML = '<a style="color:red;font-weight:bold">Failed to fetch code. Try again.</a><br><br>';
         }
-        
-        return result.match(/.{1,4}/g).join('-');
       }
     });
   </script>
