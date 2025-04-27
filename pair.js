@@ -57,23 +57,21 @@ router.get('/', async (req, res) => {
                let session = await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id, { text: '' + b64data });
 
                let GIFTED_MD_TEXT = `
-*_Pair Code Connected by ZENITSU*
-*_Made With 🚬🗿_*
+*Pair Code Connected by Elite-Tech*
+*Made With ❤️*
 ______________________________________
-╔════◇
-║ *『 AMAZING YOU'VE CHOSEN ZENITSU CRASH V2 』*
-║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
+╔════════════◇═══════════
+║ *『 YOU'VE CHOSEN ELITE-TECH 』*
+║ WhatsApp Bot Deployment Started
 ╚════════════════════════╝
-╔═════◇
-║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
-║❒ *Ytube:* _https://www.youtube.com/@BTSMODZ
-║❒ *Owner:* https://wa.me/2348075952205_
-║❒ *Repo:* _https://github.com/Fearless-tech1_
-║❒ *WaGroup:* _https://chat.whatsapp.com/C3GFThC0tIpGaJY9DFUeCK
-║❒ *WaChannel:* _https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
-║❒ *Plugins:* _https://github.com/Fearless-tech1 
+╔════════════◇════════════
+║  『••• CONTACT & RESOURCES •••』        
+║❒ *Owner:* https://wa.me/254743727510
+║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
+║❒ *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
+║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
 ╚════════════════════════╝
-_____________________________________
+_____________________________________`;
 
 _Don't Forget To Give Star To My Repo_`
  await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
