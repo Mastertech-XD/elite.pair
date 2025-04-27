@@ -1,105 +1,167 @@
-const PastebinAPI = require('pastebin-js');
-const pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep'); // Remove or secure this API key
 const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const router = express.Router();
 const pino = require("pino");
 const {
-    default: Elite_Tech,
+    default: makeWASocket,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
     Browsers
 } = require("@whiskeysockets/baileys");
 
-function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
+// Configure logger for better debugging
+const logger = pino({ level: 'debug' }).child({ module: 'pairing-code' });
+
+// Improved file removal function
+async function removeFile(FilePath) {
+    try {
+        if (!fs.existsSync(FilePath)) return false;
+        fs.rmSync(FilePath, { recursive: true, force: true });
+        return true;
+    } catch (err) {
+        logger.error(`Failed to remove ${FilePath}: ${err}`);
+        return false;
+    }
+}
+
+// Ensure temp directory exists
+const tempDir = path.join(__dirname, 'temp');
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
 }
 
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
 
-    async function ELITE_TECH_PAIR_CODE() {
-        const { state, saveCreds } = await useMultiFileAuthState(`./temp/${id}`);
+    // Validate phone number
+    if (!num || !/^[\d+]+$/.test(num)) {
+        return res.status(400).json({ error: "Invalid phone number format" });
+    }
+
+    num = num.replace(/[^0-9]/g, '');
+    const authDir = path.join(tempDir, id);
+
+    try {
+        logger.debug(`Starting pairing process for ${num}`);
         
-        try {
-            const Elite_Tech_Instance = Elite_Tech({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
-                },
-                printQRInTerminal: false,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-                browser: ["Chrome (Linux)", "", ""]
-            });
+        const { state, saveCreds } = await useMultiFileAuthState(authDir);
+        
+        const socket = makeWASocket({
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, logger),
+            },
+            printQRInTerminal: false,
+            logger: logger,
+            browser: Browsers.ubuntu('Chrome'),
+            syncFullHistory: false,
+            connectTimeoutMs: 60_000
+        });
 
-            if (!Elite_Tech_Instance.authState.creds.registered) {
-                await delay(1500);
-                num = num.replace(/[^0-9]/g, '');
-                const code = await Elite_Tech_Instance.requestPairingCode(num);
-                
-                if (!res.headersSent) {
-                    await res.send({ code });
-                }
+        // Set response timeout
+        res.setTimeout(120000, () => {
+            if (!res.headersSent) {
+                res.status(504).json({ error: "Request timeout" });
+                socket.end(undefined);
+                removeFile(authDir);
             }
+        });
 
-            Elite_Tech_Instance.ev.on('creds.update', saveCreds);
-            Elite_Tech_Instance.ev.on("connection.update", async (s) => {
-                const { connection, lastDisconnect } = s;
+        socket.ev.on('creds.update', saveCreds);
+
+        socket.ev.on("connection.update", async (update) => {
+            const { connection, lastDisconnect } = update;
+            
+            if (connection === "open") {
+                logger.debug("Connection established");
                 
-                if (connection === "open") {
-                    await delay(5000);
-                    const data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                    await delay(800);
-                    const b64data = Buffer.from(data).toString('base64');
-                    const session = await Elite_Tech_Instance.sendMessage(Elite_Tech_Instance.user.id, { text: b64data });
+                try {
+                    if (!socket.authState.creds.registered) {
+                        await delay(2000);
+                        const code = await socket.requestPairingCode(num);
+                        
+                        if (!res.headersSent) {
+                            return res.json({ 
+                                success: true,
+                                code: code,
+                                message: "Pairing code generated successfully"
+                            });
+                        }
+                    }
 
-                    const ELITE_TECH_TEXT = `
-*_Pair Code Connected by Elite-Tech_*
-*_Made With ❤️_*
+                    // Session data handling
+                    const credsPath = path.join(authDir, 'creds.json');
+                    await delay(1000);
+                    
+                    if (fs.existsSync(credsPath)) {
+                        const data = fs.readFileSync(credsPath);
+                        const b64data = Buffer.from(data).toString('base64');
+                        
+                        const session = await socket.sendMessage(
+                            socket.user.id, 
+                            { text: b64data }
+                        );
+
+                        const successMessage = `
+*Pair Code Connected by Elite-Tech*
+*Made With ❤️*
 ______________________________________
 ╔════◇
-║ *『 YOU\'VE CHOSEN ELITE-TECH 』*
-║ _WhatsApp Bot Deployment Started_
+║ *『 YOU'VE CHOSEN ELITE-TECH 』*
+║ WhatsApp Bot Deployment Started
 ╚════════════════════════╝
 ╔═════◇
 ║  『••• CONTACT & RESOURCES •••』
 ║❒ *Owner:* https://wa.me/254743727510
 ║❒ *Repo:* https://github.com/Elite-Tech/elite-tech
-║❒ *Channel:* https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
+║❒ *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
 ║❒ *Plugins:* https://github.com/Elite-Tech/elite-tech-plugins
 ╚════════════════════════╝
-_____________________________________
+_____________________________________`;
 
-_Don't Forget To Star Our Repositories_`;
+                        await socket.sendMessage(
+                            socket.user.id,
+                            { text: successMessage },
+                            { quoted: session }
+                        );
+                    }
 
-                    await Elite_Tech_Instance.sendMessage(
-                        Elite_Tech_Instance.user.id,
-                        { text: ELITE_TECH_TEXT },
-                        { quoted: session }
-                    );
-
-                    await delay(100);
-                    await Elite_Tech_Instance.ws.close();
-                    return removeFile(`./temp/${id}`);
-                } else if (connection === "close" && lastDisconnect?.error?.output.statusCode !== 401) {
-                    await delay(10000);
-                    ELITE_TECH_PAIR_CODE();
+                } catch (innerError) {
+                    logger.error("Error in connection handling:", innerError);
+                    if (!res.headersSent) {
+                        res.status(500).json({ error: "Internal processing error" });
+                    }
+                } finally {
+                    await socket.end();
+                    await removeFile(authDir);
                 }
-            });
-        } catch (err) {
-            console.error("Service error:", err);
-            await removeFile(`./temp/${id}`);
-            if (!res.headersSent) {
-                await res.status(503).send({ code: "Service Unavailable" });
+                
+            } else if (connection === "close") {
+                logger.debug("Connection closed", lastDisconnect?.error);
+                
+                if (lastDisconnect?.error?.output?.statusCode !== 401) {
+                    await delay(10_000);
+                    await removeFile(authDir);
+                }
             }
+        });
+
+    } catch (err) {
+        logger.error("Initialization failed:", err);
+        await removeFile(authDir);
+        
+        if (!res.headersSent) {
+            const status = err.message.includes('timeout') ? 504 : 500;
+            res.status(status).json({ 
+                error: "Failed to initialize pairing",
+                details: process.env.NODE_ENV === 'development' ? err.message : undefined
+            });
         }
     }
-
-    return ELITE_TECH_PAIR_CODE();
 });
 
 module.exports = router;
