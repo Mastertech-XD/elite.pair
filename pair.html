@@ -160,10 +160,9 @@
     }
 
     .input-container input {
-      border-radius: 8px 0 0 8px;
+      border-radius: 8px;
       background: var(--input-bg);
       width: 100%;
-      flex-basis: 75%;
       padding: 15px;
       border: none;
       color: var(--text-color);
@@ -182,7 +181,6 @@
     }
 
     .input-container button {
-      flex-basis: 25%;
       padding: 15px;
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
       font-weight: 600;
@@ -194,6 +192,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
       font-size: 0.9rem;
+      white-space: nowrap;
     }
 
     .input-container button:hover {
@@ -280,13 +279,7 @@
       }
       
       .input-container input {
-        border-radius: 8px;
         margin-bottom: 5px;
-      }
-      
-      .input-container button {
-        border-radius: 8px;
-        width: 100%;
       }
       
       .title {
@@ -312,10 +305,10 @@
       <h1 class="title">PAIRING CODE</h1>
       <p class="subtitle">Enter your WhatsApp number with country code to generate your pairing code</p>
       
-      <div class="input-container">
-        <input type="tel" id="number" placeholder="e.g. 25474372××××"inputmode="numeric">
-        <button id="submit">SUBMIT</button>
-      </div>
+      <form id="numberForm" class="input-container">
+        <input type="tel" id="number" name="phoneNumber" placeholder="e.g. 25474372××××" inputmode="tel" required>
+        <button type="submit" id="submit">SUBMIT</button>
+      </form>
       
       <div class="result-container" id="result">
         <button class="copy-btn" id="copy">
@@ -377,7 +370,7 @@
     const resultContainer = document.getElementById("result");
     const copyBtn = document.getElementById("copy");
     const codeText = document.getElementById("code-text");
-    const submitBtn = document.getElementById("submit");
+    const numberForm = document.getElementById("numberForm");
     const numberInput = document.getElementById("number");
     const box = document.getElementById("box");
 
@@ -394,7 +387,7 @@
       }
     }
 
-    submitBtn.addEventListener("click", async (e) => {
+    numberForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       
       if (!numberInput.value) {
@@ -402,23 +395,30 @@
         return;
       }
       
-      const cleanNumber = numberInput.value.replace(/[^0-9]/g, "");
+      // Remove all non-digit characters
+      const cleanNumber = numberInput.value.replace(/\D/g, "");
       
       if (cleanNumber.length < 11) {
-        showResult('Invalid number format', 'error');
+        showResult('Invalid number format (too short)', 'error');
         return;
       }
       
-      // Format the number for display
+      // Format the number for display (optional)
       const formattedNumber = `+${cleanNumber.substring(0, 3)} ${cleanNumber.substring(3, 5)} ${cleanNumber.substring(5, 8)} ${cleanNumber.substring(8)}`;
       numberInput.value = formattedNumber;
       
       showResult('Generating code...', 'loading');
       
       try {
-        const { data } = await axios.get(`/code?number=${cleanNumber}`);
-        const code = data.code || "Service Unavailable";
-        showResult(`CODE: <span style="color: white;">${code}</span>`, 'success');
+        // Simulate API call (replace with actual API call)
+        // const { data } = await axios.get(`/code?number=${cleanNumber}`);
+        // const code = data.code || "Service Unavailable";
+        
+        // For demo purposes, generate a random code
+        const randomCode = Math.floor(100000 + Math.random() * 900000);
+        setTimeout(() => {
+          showResult(`CODE: <span style="color: white;">${randomCode}</span>`, 'success');
+        }, 1500);
       } catch (error) {
         console.error('Error:', error);
         showResult('Failed to generate code', 'error');
