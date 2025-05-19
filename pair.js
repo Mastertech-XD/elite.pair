@@ -1,126 +1,116 @@
 const PastebinAPI = require('pastebin-js');
-const pastebin = new PastebinAPI('YOUR_API_KEY'); // Replace with a valid key
+const pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL');
 const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
 const router = express.Router();
 const pino = require("pino");
 const {
-  default: MASTER_Tech,
-  useMultiFileAuthState,
-  delay,
-  makeCacheableSignalKeyStore,
-} = require("maher-zubair-baileys");
+    default: Mastertech,
+    useMultiFileAuthState,
+    delay,
+    makeCacheableSignalKeyStore,
+    Browsers
+} = require("@whiskeysockets/baileys");
 
-// Remove session files
 function removeFile(FilePath) {
-  if (!fs.existsSync(FilePath)) return false;
-  fs.rmSync(FilePath, { recursive: true, force: true });
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
 }
 
 router.get('/', async (req, res) => {
-  const id = makeid();
-  let num = req.query.number;
-
-  // Validate phone number
-  if (!num || !/^\d+$/.test(num)) {
-    return res.status(400).send({ error: "❌ Invalid phone number! Use international format (e.g., 254743727510)" });
-  }
-
-  async function MASTERTECH_XD_PAIR_CODE() {
-    const { state, saveCreds } = await useMultiFileAuthState(`./temp/${id}`);
-    try {
-      const Pair_Code_By_Elite_Tech = MASTER_Tech({
-        auth: {
-          creds: state.creds,
-          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" })),
-        },
-        printQRInTerminal: true, // ENABLE QR CODE IN TERMINAL FOR DEBUGGING
-        logger: pino({ level: "silent" }), // Disable logs to avoid clutter
-        browser: ["Ubuntu", "Chrome", "20.0.04"], // Use a different browser agent
-      });
-
-      // Save credentials on update
-      Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds);
-
-      // Handle connection events
-      Pair_Code_By_Elite_Tech.ev.on("connection.update", async (s) => {
-        const { connection, lastDisconnect } = s;
-
-        // On successful connection
-        if (connection === "open") {
-          console.log("✅ Connected to WhatsApp!");
-          await delay(3000); // Wait for full sync
-
-          // Read and send session data
-          try {
-            const data = fs.readFileSync(`./temp/${id}/creds.json`);
-            const b64data = Buffer.from(data).toString('base64');
-
-            // Send session to user
-            await Pair_Code_By_Elite_Tech.sendMessage(
-              Pair_Code_By_Elite_Tech.user.id,
-              { text: `🔐 *YOUR SESSION DATA* (Base64):\n\n${b64data}` }
-            );
-
-            // RESTORED: Send the "Pairing Successful" message (Elite-Tech styled)
-            const ELITE_TECH_TEXT = `
-╔════════════════❖════════════════╗
-       ꧁༺ ✨ 𝗣𝗔𝗜𝗥𝗜𝗡𝗚 𝗦𝗨𝗖𝗖𝗘𝗦𝗦𝗙𝗨𝗟! ✨ ༻꧂       
-╚════════════════❖════════════════╝
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃   🚀 𝗘𝗟𝗜𝗧𝗘-𝗧𝗘𝗖𝗛 𝗙𝗥𝗔𝗠𝗘𝗪𝗢𝗥𝗞 𝟯.𝟬   ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-✅ *WhatsApp Linked Successfully!*
-📌 *Next Steps:*
-1. Run /menu to see commands
-2. Use /help for guides
-
-🔗 *Support:* https://wa.me/254743727510
-            `;
-
-            await Pair_Code_By_Elite_Tech.sendMessage(
-              Pair_Code_By_Elite_Tech.user.id,
-              { text: ELITE_TECH_TEXT }
-            );
-
-          } catch (err) {
-            console.error("❌ Failed to send session:", err);
-          }
-        }
-
-        // Auto-reconnect on close
-        else if (connection === "close") {
-          console.log("⚠️ Connection lost. Retrying in 5s...");
-          await delay(5000);
-          MASTERTECH_XD_PAIR_CODE(); // Reconnect
-        }
-      });
-
-      // Request pairing code if not registered
-      if (!Pair_Code_By_Elite_Tech.authState.creds.registered) {
-        num = num.replace(/[^0-9]/g, '');
-        const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num);
-        
-        if (!res.headersSent) {
-          res.send({ 
-            code,
-            message: `📲 *Enter this code in WhatsApp to link:* ${code}`
-          });
-        }
-      }
-    } catch (err) {
-      console.error("❌ CRASHED:", err);
-      removeFile(`./temp/${id}`);
-      if (!res.headersSent) {
-        res.status(500).send({ error: "Failed to connect. Try again later." });
-      }
+    const id = makeid();
+    let num = req.query.number;
+    
+    if (!num || num.replace(/[^0-9]/g, '').length < 11) {
+        return res.status(400).send({ error: "Invalid number" });
     }
-  }
 
-  await MASTERTECH_XD_PAIR_CODE();
+    async function MASTERTECH_MD_PAIR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        
+        try {
+            let MastertechBot = Mastertech({
+                auth: {
+                    creds: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                },
+                printQRInTerminal: false,
+                logger: pino({ level: "fatal" }).child({ level: "fatal" })),
+                browser: ["Mastertech-MD", "Desktop", "1.0.0"]
+            });
+
+            if (!MastertechBot.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g, '');
+                const code = await MastertechBot.requestPairingCode(num);
+                
+                if (!res.headersSent) {
+                    return res.send({ code });
+                }
+            }
+
+            MastertechBot.ev.on('creds.update', saveCreds);
+            MastertechBot.ev.on("connection.update", async (update) => {
+                const { connection, lastDisconnect } = update;
+                
+                if (connection === "open") {
+                    await delay(5000);
+                    let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                    await delay(800);
+                    let b64data = Buffer.from(data).toString('base64');
+                    
+                    let session = await MastertechBot.sendMessage(MastertechBot.user.id, { text: b64data });
+
+                    const MASTERTECH_TEXT = `
+┏━━━━━━━━━━━━━━
+ MASTERTECH-MD SESSION 
+┃SUCCESSFULLY CONNECTED ✅
+┗━━━━━━━━━━━━━━━
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+❶ || Creator: Masterpeace Elite
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+❷ || Channel: https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+❸ || Contact: https://wa.me/254743727510
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+❹ || GitHub: https://github.com/mastertech-md
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+© ${new Date().getFullYear()} Masterpeace Elite`;
+
+                    await MastertechBot.sendMessage(
+                        MastertechBot.user.id,
+                        { text: MASTERTECH_TEXT },
+                        { quoted: session }
+                    );
+
+                    await delay(100);
+                    await MastertechBot.ws.close();
+                    return removeFile('./temp/' + id);
+                } else if (
+                    connection === "close" &&
+                    lastDisconnect &&
+                    lastDisconnect.error &&
+                    lastDisconnect.error.output.statusCode !== 401
+                ) {
+                    await delay(10000);
+                    MASTERTECH_MD_PAIR_CODE();
+                }
+            });
+        } catch (err) {
+            console.error("Pairing error:", err);
+            removeFile('./temp/' + id);
+            
+            if (!res.headersSent) {
+                return res.status(500).send({ 
+                    code: "5ZP514L9",
+                    error: "Pairing service error" 
+                });
+            }
+        }
+    }
+
+    return MASTERTECH_MD_PAIR_CODE();
 });
 
 module.exports = router;
