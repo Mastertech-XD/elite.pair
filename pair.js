@@ -1,10 +1,11 @@
-const PastebinAPI = require('pastebin-js'),
-pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep');
+const PastebinAPI = require('pastebin-js');
+const pastebin = new PastebinAPI('1DnoOkf5Grx4euI_JnQjpVxDoUE79bep');
 const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
-let router = express.Router();
+const router = express.Router();
 const pino = require("pino");
+
 const {
     default: MASTER_Tech,
     useMultiFileAuthState,
@@ -14,16 +15,23 @@ const {
 } = require("maher-zubair-baileys");
 
 function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
-};
+    if (fs.existsSync(FilePath)) {
+        fs.rmSync(FilePath, { recursive: true, force: true });
+    }
+}
 
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
 
+    if (!num) {
+        return res.status(400).send({ error: "Phone number (number) is required in the query." });
+    }
+
+    num = num.replace(/[^0-9]/g, '');
+
     async function MASTERTECH_XD_PAIR_CODE() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        const { state, saveCreds } = await useMultiFileAuthState(`./temp/${id}`);
         try {
             let Pair_Code_By_Elite_Tech = MASTER_Tech({
                 auth: {
@@ -35,25 +43,22 @@ router.get('/', async (req, res) => {
                 browser: ["Chrome (Linux)", "", ""]
             });
 
-            // Setup listeners before pairing
             Pair_Code_By_Elite_Tech.ev.on('creds.update', saveCreds);
 
             Pair_Code_By_Elite_Tech.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
+                console.log("Connection Status:", connection);
 
                 if (connection === "open") {
                     console.log('Connected to WhatsApp. Waiting for full sync...');
-                    await delay(10000); // Wait 10 seconds for sync
+                    await delay(10000);
 
-                    let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                    await delay(800);
-                    let b64data = Buffer.from(data).toString('base64');
+                    const data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                    const b64data = Buffer.from(data).toString('base64');
 
-                    // Send session base64
-                    let session = await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: '' + b64data });
+                    const session = await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: '' + b64data });
 
-                    // Send welcome message
-                    let ELITE_TECH_TEXT = `
+                    const ELITE_TECH_TEXT = `
 *_Pair Code Connected by Elite-Tech_*
 *_Made With ♥️👀_*
 ______________________________________
@@ -74,13 +79,12 @@ _Don't Forget To Give Star To My Repo_`;
 
                     await Pair_Code_By_Elite_Tech.sendMessage(Pair_Code_By_Elite_Tech.user.id, { text: ELITE_TECH_TEXT }, { quoted: session });
 
-                    // OPTIONAL: Upload to Pastebin
                     try {
                         const paste = await pastebin.createPaste({
                             title: `Elite-Tech Session - ${id}`,
                             content: b64data,
                             format: "text",
-                            privacy: 1, // unlisted
+                            privacy: 1,
                             expireDate: "1D"
                         });
 
@@ -90,38 +94,47 @@ _Don't Forget To Give Star To My Repo_`;
                             text: `✅ Your Session Backup (Pastebin Link):\n${paste}`
                         });
                     } catch (err) {
-                        console.log('Failed to upload session to Pastebin:', err.message);
+                        console.log('Pastebin upload failed:', err.message);
                     }
+                }
 
-                    console.log('Bot is fully connected and now staying active.');
-                } 
-                else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode !== 401) {
-                    console.log('Connection closed, retrying in 10 seconds...');
-                    await delay(10000);
-                    await MASTERTECH_XD_PAIR_CODE();
+                else if (connection === "close") {
+                    const code = lastDisconnect?.error?.output?.statusCode;
+                    console.log(`Connection closed: status ${code}`);
+                    if (code !== 401) {
+                        console.log('Reconnecting...');
+                        await delay(10000);
+                        await MASTERTECH_XD_PAIR_CODE();
+                    }
                 }
             });
 
             if (!Pair_Code_By_Elite_Tech.authState.creds.registered) {
                 await delay(1500);
-                num = num.replace(/[^0-9]/g, '');
-                const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num);
-
-                if (!res.headersSent) {
-                    await res.send({ code });
+                try {
+                    const code = await Pair_Code_By_Elite_Tech.requestPairingCode(num);
+                    if (!res.headersSent) {
+                        return res.send({ code });
+                    }
+                } catch (err) {
+                    console.log("Error getting pairing code:", err.message);
+                    await removeFile(`./temp/${id}`);
+                    if (!res.headersSent) {
+                        return res.status(500).send({ error: "Failed to request pairing code. Check number validity." });
+                    }
                 }
             }
 
         } catch (err) {
-            console.log("Service restarted due to error:", err.message);
-            await removeFile('./temp/' + id);
+            console.error("Unexpected error:", err.message);
+            await removeFile(`./temp/${id}`);
             if (!res.headersSent) {
-                await res.send({ code: "Service Unavailable" });
+                return res.status(500).send({ error: "Internal server error during session setup." });
             }
         }
     }
 
-    return await MASTERTECH_XD_PAIR_CODE();
+    await MASTERTECH_XD_PAIR_CODE();
 });
 
 module.exports = router;
