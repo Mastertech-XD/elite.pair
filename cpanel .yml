@@ -1,6 +1,13 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/giftech-web-cpanel/home/wabots-session/public_html/
-    - /bin/cp -R images $DEPLOYPATH
-    
+services:
+  - type: web
+    name: elite-session-generator
+    env: node
+    repo: https://github.com/Mastertech-XD/elite.pair
+    branch: main
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MESSAGE
+        value: "Welcome to Elite Session Generator!"
