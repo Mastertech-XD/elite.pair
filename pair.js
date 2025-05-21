@@ -1,126 +1,100 @@
-const PastebinAPI = require('pastebin-js');
-const pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL');
-const { makeid } = require('./id');
+const PastebinAPI = require('pastebin-js'),
+pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
+const {makeid} = require('./id');
 const express = require('express');
 const fs = require('fs');
-const pino = require('pino');
+let router = express.Router()
+const pino = require("pino");
 const {
-    default: Brasho_Kish,
+    default: Gifted_Tech,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
-} = require('maher-zubair-baileys');
+    Browsers
+} = require("maher-zubair-baileys");
 
-const router = express.Router();
-
-const audioUrls = [
-    "https://files.catbox.moe/hpwsi2.mp3",
-    "https://files.catbox.moe/xci982.mp3",
-    "https://files.catbox.moe/utbujd.mp3",
-    "https://files.catbox.moe/w2j17k.m4a",
-    "https://files.catbox.moe/851skv.m4a",
-    "https://files.catbox.moe/qnhtbu.m4a",
-    "https://files.catbox.moe/lb0x7w.mp3",
-    "https://files.catbox.moe/efmcxm.mp3",
-    "https://files.catbox.moe/gco5bq.mp3",
-    "https://files.catbox.moe/26oeeh.mp3",
-    "https://files.catbox.moe/a1sh4u.mp3",
-    "https://files.catbox.moe/vuuvwn.m4a",
-    "https://files.catbox.moe/wx8q6h.mp3",
-    "https://files.catbox.moe/uj8fps.m4a",
-    "https://files.catbox.moe/dc88bx.m4a",
-    "https://files.catbox.moe/tn32z0.m4a",
-    "https://files.catbox.moe/9fm6gi.mp3",
-    "https://files.catbox.moe/9h8i2a.mp3",
-    "https://files.catbox.moe/5pm55z.mp3",
-    "https://files.catbox.moe/zjk77k.mp3",
-    "https://files.catbox.moe/fe5lem.m4a",
-    "https://files.catbox.moe/4b1ohl.mp3"
-];
-
-// Helper function to remove files
-function removeFile(filePath) {
-    if (!fs.existsSync(filePath)) return false;
-    fs.rmSync(filePath, { recursive: true, force: true });
-}
-
-// Route handler
+function removeFile(FilePath){
+    if(!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true })
+ };
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-
-    async function LEGACY_MD_PAIR_CODE() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
-        try {
-            const Pair_Code_By_Brasho_Kish = Brasho_Kish({
+        async function GIFTED_MD_PAIR_CODE() {
+        const {
+            state,
+            saveCreds
+        } = await useMultiFileAuthState('./temp/'+id)
+     try {
+            let Pair_Code_By_Gifted_Tech = Gifted_Tech({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }).child({ level: 'fatal' })),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: 'fatal' }).child({ level: 'fatal' }),
-                browser: ['Chrome (Linux)', '', '']
-            });
-
-            if (!Pair_Code_By_Brasho_Kish.authState.creds.registered) {
+                logger: pino({level: "fatal"}).child({level: "fatal"}),
+                browser: ["Chrome (Linux)", "", ""]
+             });
+             if(!Pair_Code_By_Gifted_Tech.authState.creds.registered) {
                 await delay(1500);
-                num = num.replace(/[^0-9]/g, '');
-                const code = await Pair_Code_By_Brasho_Kish.requestPairingCode(num);
+                        num = num.replace(/[^0-9]/g,'');
+                            const code = await Pair_Code_By_Gifted_Tech.requestPairingCode(num)
+                 if(!res.headersSent){
+                 await res.send({code});
+                     }
+                 }
+            Pair_Code_By_Gifted_Tech.ev.on('creds.update', saveCreds)
+            Pair_Code_By_Gifted_Tech.ev.on("connection.update", async (s) => {
+                const {
+                    connection,
+                    lastDisconnect
+                } = s;
+                if (connection == "open") {
+                await delay(5000);
+                let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                await delay(800);
+               let b64data = Buffer.from(data).toString('base64');
+               let session = await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id, { text: '' + b64data });
 
-                if (!res.headersSent) {
-                    await res.send({ code });
-                }
-            }
+               let GIFTED_MD_TEXT = `
+*_Pair Code Connected by ZENITSU*
+*_Made With 🚬🗿_*
+______________________________________
+╔════◇
+║ *『 AMAZING YOU'VE CHOSEN MASTETECH-XD 』*
+║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
+╚════════════════════════╝
+╔═════◇
+║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
+║❒ *Ytube:* _https://www.youtube.com/@BTSMODZ
+║❒ *Owner:* https://wa.me/234743727510_
+║❒ *Repo:* _https://github.com/Fearless-tech1_
+║❒ *WaGroup:* _https://chat.whatsapp.com/C3GFThC0tIpGaJY9DFUeCK
+║❒ *WaChannel:* _https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
+║❒ *Plugins:* _https://github.com/Fearless-tech1 
+╚════════════════════════╝
+_____________________________________
 
-            Pair_Code_By_Brasho_Kish.ev.on('creds.update', saveCreds);
-            Pair_Code_By_Brasho_Kish.ev.on('connection.update', async (s) => {
-                const { connection, lastDisconnect } = s;
-                if (connection === 'open') {
-                    await delay(5000);
-                    const data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                    await delay(800);
-                    const b64data = Buffer.from(data).toString('base64');
-                    const session = await Pair_Code_By_Brasho_Kish.sendMessage(Pair_Code_By_Brasho_Kish.user.id, { text: '' + b64data });
+_Don't Forget To Give Star To My Repo_`
+ await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
+ 
 
-                    // Send random audio after session
-                    const randomAudioUrl = audioUrls[Math.floor(Math.random() * audioUrls.length)];
-                    await Pair_Code_By_Brasho_Kish.sendMessage(Pair_Code_By_Brasho_Kish.user.id, {
-                        audio: { url: randomAudioUrl },
-                        mimetype: 'audio/mpeg',
-                        ptt: true,
-                        waveform: [100, 0, 100, 0, 100, 0, 100], // Optional waveform pattern
-                        fileName: 'shizo',
-                        contextInfo: {
-                            mentionedJid: [Pair_Code_By_Brasho_Kish.user.id], // Mention the sender in the audio message
-                            externalAdReply: {
-                                title: 'Thanks for choosing 𝐍𝐄𝐗𝐔𝐒 𝗦𝘂𝗽𝗽𝗼𝗿𝘁 happy deployment 💜',
-                                body: 'Regards King Malvin',
-                                thumbnailUrl: 'https://files.catbox.moe/fq30m0.jpg',
-                                sourceUrl: 'https://whatsapp.com/channel/0029Vac8SosLY6d7CAFndv3Z',
-                                mediaType: 1,
-                                renderLargerThumbnail: true,
-                            },
-                        },
-                    }, { quoted: session });
-
-                    await delay(100);
-                    await Pair_Code_By_Brasho_Kish.ws.close();
-                    removeFile('./temp/' + id);
-                } else if (connection === 'close' && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode !== 401) {
+        await delay(100);
+        await Pair_Code_By_Gifted_Tech.ws.close();
+        return await removeFile('./temp/'+id);
+            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    LEGACY_MD_PAIR_CODE();
+                    GIFTED_MD_PAIR_CODE();
                 }
             });
         } catch (err) {
-            console.log('service restarted', err);
-            removeFile('./temp/' + id);
-            if (!res.headersSent) {
-                await res.send({ code: 'Service Currently Unavailable' });
-            }
+            console.log("service restated");
+            await removeFile('./temp/'+id);
+         if(!res.headersSent){
+            await res.send({code:"Service Unavailable"});
+         }
         }
     }
-
-    await LEGACY_MD_PAIR_CODE();
+    return await GIFTED_MD_PAIR_CODE()
 });
-
-module.exports = router;
+module.exports = router
