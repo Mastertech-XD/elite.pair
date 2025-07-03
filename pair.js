@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
     if (!num || num.replace(/[^0-9]/g, '').length < 11) {
         return res.status(400).json({ 
             status: false,
-            message: "Invalid number. Please provide a valid WhatsApp number with country code."
+            message: "Invalid WhatsApp number. Please include country code."
         });
     }
 
@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({ level: "fatal" }).child({ level: "fatal" })),
-                browser: ["Mastertech-MD", "Desktop", "1.0.0"]
+                browser: Browsers.macOS("Desktop")
             });
 
             if (!MastertechBot.authState.creds.registered) {
@@ -49,10 +49,11 @@ router.get('/', async (req, res) => {
                 const code = await MastertechBot.requestPairingCode(num);
                 
                 if (!res.headersSent) {
-                    return res.json({ 
+                    return res.json({
                         status: true,
+                        number: `+${num}`,
                         pairingCode: code,
-                        instructions: `Open WhatsApp on the phone with number ${num}, go to Menu > Linked Devices > Link a Device, and enter this code: ${code}`
+                        instructions: "Open WhatsApp → Linked Devices → Enter this code"
                     });
                 }
             }
@@ -67,56 +68,55 @@ router.get('/', async (req, res) => {
                     await delay(800);
                     let b64data = Buffer.from(data).toString('base64');
                     
-                    // Send session credentials
-                    let sessionMsg = await MastertechBot.sendMessage(
-                        MastertechBot.user.id, 
+                    // Send session credentials first
+                    const sessionMsg = await MastertechBot.sendMessage(
+                        MastertechBot.user.id,
                         { 
-                            text: `🔐 *YOUR SESSION CREDENTIALS* 🔐\n\n` +
-                                  `*DO NOT SHARE THIS WITH ANYONE!*\n\n` +
+                            text: `🔐 *SESSION CREDENTIALS* 🔐\n\n` +
+                                  `╔══════════════════════╗\n` +
+                                  `  DON'T SHARE WITH ANYONE!\n` +
+                                  `╚══════════════════════╝\n\n` +
                                   `${b64data}\n\n` +
-                                  `This is your session data. Keep it safe to restore your connection.`
+                                  `Use this to restore your session.`
                         }
                     );
 
-                    // Send beautiful formatted note
+                    // Send beautiful formatted message
                     const MASTERTECH_TEXT = `
 ╔══════════════════════╗
-  🚀 *MASTERTECH-MD* 🚀
+  🚀 MASTERTECH-MD 🚀
 ╚══════════════════════╝
 
-✅ *Successfully Connected!*
+✅ SUCCESSFULLY PAIRED!
 
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-🌟 *Creator:* Masterpeace Elite
+👑 Creator: Masterpeace Elite
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-📢 *Channel:* https://whatsapp.com/channel/0029VazeyYx35fLxhB5TfC3D
+📢 Channel: whatsapp.com/channel/0029Vaz...
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-📞 *Contact:* https://wa.me/254743727510
+📞 Contact: wa.me/254743727510
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-💻 *GitHub:* https://github.com/mastertech-md
+💻 GitHub: github.com/mastertech-md
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-
-© ${new Date().getFullYear()} Masterpeace Elite | All Rights Reserved`;
+© ${new Date().getFullYear()} | All Rights Reserved`;
 
                     await MastertechBot.sendMessage(
                         MastertechBot.user.id,
                         { 
                             text: MASTERTECH_TEXT,
-                            linkPreview: true
+                            linkPreview: false
                         },
                         { quoted: sessionMsg }
                     );
 
-                    // Close connection and clean up
                     await delay(100);
                     await MastertechBot.ws.close();
                     removeFile('./temp/' + id);
                     
-                    // If HTTP request still open, send success
                     if (!res.headersSent) {
                         return res.json({
                             status: true,
-                            message: "Successfully paired! Check your WhatsApp for session details."
+                            message: "Device successfully paired!"
                         });
                     }
                 } else if (
@@ -136,7 +136,7 @@ router.get('/', async (req, res) => {
             if (!res.headersSent) {
                 return res.status(500).json({ 
                     status: false,
-                    message: "Pairing service error",
+                    message: "Pairing failed",
                     error: err.message
                 });
             }
