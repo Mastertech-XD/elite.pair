@@ -1,149 +1,177 @@
-const PastebinAPI = require('pastebin-js');
-const pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL');
-const { makeid } = require('./id');
+const { makeid } = require('./gen-id');
 const express = require('express');
 const fs = require('fs');
-const router = express.Router();
+let router = express.Router();
 const pino = require("pino");
-const {
-    default: Mastertech,
-    useMultiFileAuthState,
-    delay,
-    makeCacheableSignalKeyStore,
-    Browsers
-} = require("@whiskeysockets/baileys");
+const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore, getAggregateVotesInPollMessage, DisconnectReason, WA_DEFAULT_EPHEMERAL, jidNormalizedUser, proto, getDevice, generateWAMessageFromContent, fetchLatestBaileysVersion, makeInMemoryStore, getContentType, generateForwardMessageContent, downloadContentFromMessage, jidDecode } = require('@whiskeysockets/baileys')
 
+const { upload } = require('./mega');
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
     fs.rmSync(FilePath, { recursive: true, force: true });
 }
-
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-    
-    if (!num || num.replace(/[^0-9]/g, '').length < 11) {
-        return res.status(400).json({ 
-            status: false,
-            message: "Invalid WhatsApp number. Please include country code."
-        });
-    }
-
-    async function MASTERTECH_MD_PAIR_CODE() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
-        
+    async function MALVIN_XD_PAIR_CODE() {
+        const {
+            state,
+            saveCreds
+        } = await useMultiFileAuthState('./temp/' + id);
         try {
-            let MastertechBot = Mastertech({
+var items = ["Safari"];
+function selectRandomItem(array) {
+  var randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+}
+var randomItem = selectRandomItem(items);
+            
+            let sock = makeWASocket({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" })),
-                browser: Browsers.macOS("Desktop")
+                generateHighQualityLinkPreview: true,
+                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                syncFullHistory: false,
+                browser: Browsers.macOS(randomItem)
             });
-
-            if (!MastertechBot.authState.creds.registered) {
+            if (!sock.authState.creds.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
-                const code = await MastertechBot.requestPairingCode(num);
-                
+                const code = await sock.requestPairingCode(num);
                 if (!res.headersSent) {
-                    return res.json({
-                        status: true,
-                        number: `+${num}`,
-                        pairingCode: code,
-                        instructions: "Open WhatsApp → Linked Devices → Enter this code"
-                    });
+                    await res.send({ code });
                 }
             }
+            sock.ev.on('creds.update', saveCreds);
+            sock.ev.on("connection.update", async (s) => {
 
-            MastertechBot.ev.on('creds.update', saveCreds);
-            MastertechBot.ev.on("connection.update", async (update) => {
-                const { connection, lastDisconnect } = update;
+    const {
+                    connection,
+                    lastDisconnect
+                } = s;
                 
-                if (connection === "open") {
+                if (connection == "open") {
                     await delay(5000);
                     let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                    await delay(800);
-                    let b64data = Buffer.from(data).toString('base64');
-                    
-                    // Send session credentials first
-                    const sessionMsg = await MastertechBot.sendMessage(
-                        MastertechBot.user.id,
-                        { 
-                            text: `🔐 *SESSION CREDENTIALS* 🔐\n\n` +
-                                  `╔══════════════════════╗\n` +
-                                  `  DON'T SHARE WITH ANYONE!\n` +
-                                  `╚══════════════════════╝\n\n` +
-                                  `${b64data}\n\n` +
-                                  `Use this to restore your session.`
+                    let rf = __dirname + `/temp/${id}/creds.json`;
+                    function generateRandomText() {
+                        const prefix = "3EB";
+                        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                        let randomText = prefix;
+                        for (let i = prefix.length; i < 22; i++) {
+                            const randomIndex = Math.floor(Math.random() * characters.length);
+                            randomText += characters.charAt(randomIndex);
                         }
-                    );
-
-                    // Send beautiful formatted message
-                    const MASTERTECH_TEXT = `
-╔══════════════════════╗
-  🚀 MASTERTECH-MD 🚀
-╚══════════════════════╝
-
-✅ SUCCESSFULLY PAIRED!
-
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-👑 Creator: Masterpeace Elite
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-📢 Channel: whatsapp.com/channel/0029Vaz...
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-📞 Contact: wa.me/254743727510
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-💻 GitHub: github.com/mastertech-md
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-© ${new Date().getFullYear()} | All Rights Reserved`;
-
-                    await MastertechBot.sendMessage(
-                        MastertechBot.user.id,
-                        { 
-                            text: MASTERTECH_TEXT,
-                            linkPreview: false
-                        },
-                        { quoted: sessionMsg }
-                    );
-
-                    await delay(100);
-                    await MastertechBot.ws.close();
-                    removeFile('./temp/' + id);
-                    
-                    if (!res.headersSent) {
-                        return res.json({
-                            status: true,
-                            message: "Device successfully paired!"
-                        });
+                        return randomText;
                     }
-                } else if (
-                    connection === "close" &&
-                    lastDisconnect &&
-                    lastDisconnect.error &&
-                    lastDisconnect.error.output.statusCode !== 401
-                ) {
-                    await delay(10000);
-                    MASTERTECH_MD_PAIR_CODE();
+                    const randomText = generateRandomText();
+                    try {
+
+
+                        
+                        const { upload } = require('./mega');
+                        const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
+                        const string_session = mega_url.replace('https://mega.nz/file/', '');
+                        let md = "malvin~" + string_session;
+                        let code = await sock.sendMessage(sock.user.id, { text: md });
+                        let desc = `*Hey there, MALVIN-XD User!* 👋🏻
+
+Thanks for using *MALVIN-XD* — your session has been successfully created!
+
+🔐 *Session ID:* Sent above  
+⚠️ *Keep it safe!* Do NOT share this ID with anyone.
+
+——————
+
+*✅ Stay Updated:*  
+Join our official WhatsApp Channel:  
+https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
+
+*💻 Source Code:*  
+Fork & explore the project on GitHub:  
+https://github.com/XdKing2/MALVIN-XD
+
+——————
+
+> *© Powered by Malvin King*
+Stay cool and hack smart. ✌🏻`; 
+                        await sock.sendMessage(sock.user.id, {
+text: desc,
+contextInfo: {
+externalAdReply: {
+title: "ᴍᴀʟᴠɪɴ-xᴅ",
+thumbnailUrl: "https://files.catbox.moe/bqs70b.jpg",
+sourceUrl: "https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A",
+mediaType: 1,
+renderLargerThumbnail: true
+}  
+}
+},
+{quoted:code })
+                    } catch (e) {
+                            let ddd = sock.sendMessage(sock.user.id, { text: e });
+                            let desc = `Hey there, MALVIN-XD User!* 👋🏻
+
+Thanks for using *MALVIN-XD* — your session has been successfully created!
+
+🔐 *Session ID:* Sent above  
+⚠️ *Keep it safe!* Do NOT share this ID with anyone.
+
+——————
+
+*✅ Stay Updated:*  
+Join our official WhatsApp Channel:  
+https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
+
+*💻 Source Code:*  
+Fork & explore the project on GitHub:  
+https://github.com/XdKing2/MALVIN-XD
+
+——————
+
+> *© Powered by Malvin King*
+Stay cool and hack smart. ✌🏻`;
+                            await sock.sendMessage(sock.user.id, {
+text: desc,
+contextInfo: {
+externalAdReply: {
+title: "ᴍᴀʟᴠɪɴ-xᴅ",
+thumbnailUrl: "https://i.imgur.com/GVW7aoD.jpeg",
+sourceUrl: "https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A",
+mediaType: 2,
+renderLargerThumbnail: true,
+showAdAttribution: true
+}  
+}
+},
+{quoted:ddd })
+                    }
+                    await delay(10);
+                    await sock.ws.close();
+                    await removeFile('./temp/' + id);
+                    console.log(`👤 ${sock.user.id} 𝗖𝗼𝗻𝗻𝗲𝗰𝘁𝗲𝗱 ✅ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...`);
+                    await delay(10);
+                    process.exit();
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                    await delay(10);
+                    MALVIN_XD_PAIR_CODE();
                 }
             });
         } catch (err) {
-            console.error("Pairing error:", err);
-            removeFile('./temp/' + id);
-            
+            console.log("service restated");
+            await removeFile('./temp/' + id);
             if (!res.headersSent) {
-                return res.status(500).json({ 
-                    status: false,
-                    message: "Pairing failed",
-                    error: err.message
-                });
+                await res.send({ code: "❗ Service Unavailable" });
             }
         }
     }
-
-    return MASTERTECH_MD_PAIR_CODE();
-});
-
+   return await MALVIN_XD_PAIR_CODE();
+});/*
+setInterval(() => {
+    console.log("☘️ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...");
+    process.exit();
+}, 180000); //30min*/
 module.exports = router;
