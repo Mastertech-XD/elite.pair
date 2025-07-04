@@ -6,10 +6,10 @@ const fs = require('fs');
 const router = express.Router();
 const pino = require("pino");
 const {
-    default: Wasi_Tech,
+    default: makeWASocket,
     useMultiFileAuthState,
-    Browsers,
-    delay
+    delay,
+    Browsers
 } = require("@whiskeysockets/baileys");
 
 function removeFile(FilePath) {
@@ -21,19 +21,19 @@ router.get('/', async (req, res) => {
     const id = makeid();
     
     async function WASI_MD_QR_CODE() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, `./temp/${id}`));
         
         try {
-            let Qr_Code_By_Wasi_Tech = Wasi_Tech({
+            let sock = makeWASocket({
                 auth: state,
                 printQRInTerminal: false,
                 logger: pino({ level: "silent" }),
-                browser: Browsers.ubuntu("Chrome"),
+                browser: Browsers.ubuntu("Chrome")
             });
 
-            Qr_Code_By_Wasi_Tech.ev.on('creds.update', saveCreds);
-            Qr_Code_By_Wasi_Tech.ev.on("connection.update", async (s) => {
-                const { connection, lastDisconnect, qr } = s;
+            sock.ev.on('creds.update', saveCreds);
+            sock.ev.on("connection.update", async (update) => {
+                const { connection, lastDisconnect, qr } = update;
                 
                 if (qr) {
                     try {
@@ -41,7 +41,9 @@ router.get('/', async (req, res) => {
                         res.type('png').send(qrBuffer);
                     } catch (err) {
                         console.error("QR generation error:", err);
-                        res.status(500).json({ error: "Failed to generate QR" });
+                        if (!res.headersSent) {
+                            res.status(500).json({ error: "Failed to generate QR" });
+                        }
                     }
                 }
                 
@@ -51,27 +53,41 @@ router.get('/', async (req, res) => {
                         let data = fs.readFileSync(path.join(__dirname, `./temp/${id}/creds.json`));
                         let b64data = Buffer.from(data).toString('base64');
                         
-                        await Qr_Code_By_Wasi_Tech.sendMessage(
-                            Qr_Code_By_Wasi_Tech.user.id, 
-                            { text: b64data }
+                        let session = await sock.sendMessage(sock.user.id, { text: b64data });
+
+                        const WASI_MD_TEXT = `
+╔══════════════════════╗
+  🚀 MASTERTECH-MD 🚀
+╚══════════════════════╝
+
+✅ SUCCESSFULLY CONNECTED!
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+👑 Creator: Masterpeace Elite
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+📢 Channel: whatsapp.com/channel/0029Vaz...
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+📞 Contact: wa.me/254743727510
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+💻 GitHub: github.com/mastertech-md
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+© ${new Date().getFullYear()} | All Rights Reserved`;
+
+                        await sock.sendMessage(
+                            sock.user.id,
+                            { text: WASI_MD_TEXT },
+                            { quoted: session }
                         );
 
-                        const WASI_MD_TEXT = `...`; // Your existing message
-                        
-                        await Qr_Code_By_Wasi_Tech.sendMessage(
-                            Qr_Code_By_Wasi_Tech.user.id,
-                            { text: WASI_MD_TEXT }
-                        );
-
-                        await Qr_Code_By_Wasi_Tech.ws.close();
-                        removeFile(`./temp/${id}`);
+                        await sock.ws.close();
+                        removeFile(path.join(__dirname, `./temp/${id}`));
                     } catch (err) {
                         console.error("Session save error:", err);
                     }
                 } else if (
-                    connection === "close" && 
-                    lastDisconnect && 
-                    lastDisconnect.error && 
+                    connection === "close" &&
+                    lastDisconnect &&
+                    lastDisconnect.error &&
                     lastDisconnect.error.output.statusCode !== 401
                 ) {
                     await delay(10000);
@@ -80,7 +96,7 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.error("Connection error:", err);
-            removeFile(`./temp/${id}`);
+            removeFile(path.join(__dirname, `./temp/${id}`));
             if (!res.headersSent) {
                 res.status(500).json({ error: "Connection failed" });
             }
