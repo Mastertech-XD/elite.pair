@@ -3,9 +3,9 @@ const express = require('express');
 const fs = require('fs');
 let router = express.Router();
 const pino = require("pino");
-const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore, getAggregateVotesInPollMessage, DisconnectReason, WA_DEFAULT_EPHEMERAL, jidNormalizedUser, proto, getDevice, generateWAMessageFromContent, fetchLatestBaileysVersion, makeInMemoryStore, getContentType, generateForwardMessageContent, downloadContentFromMessage, jidDecode } = require('@whiskeysockets/baileys')
-
+const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys');
 const { upload } = require('./mega');
+
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
     fs.rmSync(FilePath, { recursive: true, force: true });
@@ -14,79 +14,79 @@ function removeFile(FilePath) {
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
+    
     async function MASTERTECH_XD_PAIR_CODE() {
+        console.log(`Starting pairing process for ${num || 'new session'}`);
         const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        
         try {
-            var items = ["Safari"];
-            function selectRandomItem(array) {
-                var randomIndex = Math.floor(Math.random() * array.length);
-                return array[randomIndex];
-            }
-            var randomItem = selectRandomItem(items);
-            
             let sock = makeWASocket({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
                 },
                 printQRInTerminal: false,
-                generateHighQualityLinkPreview: true,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                logger: pino({ level: "silent" }),
                 syncFullHistory: false,
-                browser: Browsers.macOS(randomItem)
+                browser: Browsers.macOS("Safari")
             });
 
-            if (!sock.authState.creds.registered) {
-                await delay(1500);
-                num = num.replace(/[^0-9]/g, '');
-                const code = await sock.requestPairingCode(num);
-                if (!res.headersSent) {
-                    await res.send({ code });
-                }
-            }
-
             sock.ev.on('creds.update', saveCreds);
-            sock.ev.on("connection.update", async (s) => {
-                const { connection, lastDisconnect } = s;
+            
+            sock.ev.on("connection.update", async (update) => {
+                console.log('Connection update:', update.status);
                 
-                if (connection == "open") {
-                    await delay(5000);
-                    let rf = __dirname + `/temp/${id}/creds.json`;
-                    
+                if (update.qr) {
+                    console.log('QR code received');
+                }
+
+                // Handle pairing code request
+                if (!sock.authState.creds.registered && update.connection === "connecting") {
                     try {
-                        const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
-                        const string_session = mega_url.replace('https://mega.nz/file/', '');
-                        let md = "mastertech~" + string_session;
+                        num = num.replace(/[^0-9]/g, '');
+                        console.log(`Requesting pairing code for ${num}`);
+                        const code = await sock.requestPairingCode(num);
+                        if (!res.headersSent) {
+                            res.send({ code });
+                        }
+                    } catch (pairingError) {
+                        console.error('Pairing failed:', pairingError);
+                        if (!res.headersSent) {
+                            res.status(500).send({ error: "Pairing failed" });
+                        }
+                        throw pairingError;
+                    }
+                }
+
+                // Connection successful
+                if (update.connection === "open") {
+                    console.log('Connection opened, preparing session...');
+                    await delay(3000); // Stabilization delay
+
+                    try {
+                        const credsPath = __dirname + `/temp/${id}/creds.json`;
+                        console.log('Uploading session file:', credsPath);
                         
-                        const welcomeMsg = `
-🌟 *𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝘁𝗼 𝗠𝗔𝗦𝗧𝗘𝗥𝗧𝗘𝗖𝗛-𝗫𝗗!* 🌟
-
-┏━━━━━━━━━━━━━━━━━━━┓
-┃  🚀 𝗖𝗢𝗡𝗡𝗘𝗖𝗧𝗜𝗢𝗡 𝗦𝗨𝗖𝗖𝗘𝗦𝗦!  
-┗━━━━━━━━━━━━━━━━━━━┛
-
-📛 *Bot Name:* ${sock.user.name || 'Not Configured'}
-📱 *Phone:* ${sock.user.id.replace(/:\d+@/, '@')}
-🖥️ *Platform:* ${sock.user.platform || 'Unknown'}
-
-┏━━━━━━━━━━━━━━━━━━━┓
-┃  🔗 𝗘𝗦𝗦𝗘𝗡𝗧𝗜𝗔𝗟 𝗟𝗜𝗡𝗞𝗦  
-┗━━━━━━━━━━━━━━━━━━━┛
-
-👑 *Creator:* MASTERPEACE ELITE
-💻 *GitHub:* github.com/MASTERPEACE-ELITE
-📢 *Updates:* whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
-
-✨ *Session Ready!* ✨
-🔐 Your credentials are securely stored.
-`;
-
-                        let code = await sock.sendMessage(sock.user.id, { 
-                            text: welcomeMsg,
+                        // 1. Upload session file
+                        const mega_url = await upload(fs.createReadStream(credsPath), `${sock.user.id}.json`);
+                        if (!mega_url) throw new Error("Upload returned no URL");
+                        
+                        // 2. Prepare session code
+                        const string_session = mega_url.replace('https://mega.nz/file/', '');
+                        const sessionCode = "mastertech~" + string_session;
+                        
+                        // 3. Send welcome message
+                        console.log('Sending welcome message...');
+                        await sock.sendMessage(sock.user.id, {
+                            text: `🌟 *MASTERTECH-XD ACTIVATED* 🌟\n\n` +
+                                  `✅ Session successfully created!\n\n` +
+                                  `📱 *Your Account:* ${sock.user.id.replace(/:\d+@/, '@')}\n` +
+                                  `🖥️ *Platform:* ${sock.user.platform || 'Unknown'}\n\n` +
+                                  `🔐 *Keep your session code secure!*`,
                             contextInfo: {
                                 externalAdReply: {
-                                    title: "MASTERTECH-XD CONNECTED",
-                                    body: "Your elite WhatsApp experience starts now!",
+                                    title: "MASTERTECH-XD READY",
+                                    body: "Your elite WhatsApp experience",
                                     thumbnailUrl: "https://i.imgur.com/xyz1234.jpg",
                                     sourceUrl: "https://github.com/MASTERPEACE-ELITE",
                                     mediaType: 1
@@ -94,33 +94,63 @@ router.get('/', async (req, res) => {
                             }
                         });
 
-                        await sock.sendMessage(sock.user.id, { text: md });
+                        // 4. Send session code
+                        await delay(1000);
+                        console.log('Sending session code...');
+                        await sock.sendMessage(sock.user.id, { text: sessionCode });
 
-                    } catch (e) {
-                        console.error("Error:", e);
-                        await sock.sendMessage(sock.user.id, { text: `⚠️ Error: ${e.message}` });
+                        // 5. Send final instructions
+                        await delay(1000);
+                        await sock.sendMessage(sock.user.id, {
+                            text: `👑 *Creator:* MASTERPEACE ELITE\n` +
+                                  `💻 *GitHub:* github.com/MASTERPEACE-ELITE\n` +
+                                  `📢 *Updates:* whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A\n\n` +
+                                  `The bot will now restart to finalize setup...`
+                        });
+
+                    } catch (sessionError) {
+                        console.error('Session setup failed:', sessionError);
+                        await sock.sendMessage(sock.user.id, {
+                            text: `❌ Setup Error:\n${sessionError.message}\n\nPlease try again.`
+                        });
+                    } finally {
+                        // Cleanup with delays
+                        await delay(3000);
+                        console.log('Cleaning up session...');
+                        await sock.ws.close();
+                        await removeFile('./temp/' + id);
+                        console.log('Process exiting...');
+                        process.exit(0);
                     }
+                }
 
-                    await delay(10);
-                    await sock.ws.close();
-                    await removeFile('./temp/' + id);
-                    console.log(`👤 ${sock.user.id} 𝗖𝗼𝗻𝗻𝗲𝗰𝘁𝗲𝗱 ✅ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...`);
-                    await delay(10);
-                    process.exit();
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10);
-                    MASTERTECH_XD_PAIR_CODE();
+                // Handle connection failures
+                if (update.connection === "close") {
+                    const shouldReconnect = update.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+                    console.log(`Connection closed, should reconnect: ${shouldReconnect}`);
+                    
+                    if (shouldReconnect) {
+                        await delay(1000);
+                        MASTERTECH_XD_PAIR_CODE();
+                    }
                 }
             });
-        } catch (err) {
-            console.log("service restarted");
+
+        } catch (initError) {
+            console.error('Initialization error:', initError);
             await removeFile('./temp/' + id);
             if (!res.headersSent) {
-                await res.send({ code: "❗ Service Unavailable" });
+                res.status(500).send({ error: "Service unavailable" });
             }
         }
     }
-    return await MASTERTECH_XD_PAIR_CODE();
+
+    return MASTERTECH_XD_PAIR_CODE().catch(err => {
+        console.error('Pairing process failed:', err);
+        if (!res.headersSent) {
+            res.status(500).send({ error: "Pairing process failed" });
+        }
+    });
 });
 
 module.exports = router;
