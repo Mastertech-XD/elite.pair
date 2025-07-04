@@ -1,13 +1,12 @@
 services:
   - type: web
-    name: elite-session-generator
+    name: elite-sessions-pair
     env: node
-    repo: https://github.com/Mastertech-XD/elite.pair
-    branch: main
-    buildCommand: npm install
-    startCommand: node index.js
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
     envVars:
       - key: PORT
-        value: 5000
-      - key: MESSAGE
-        value: "Welcome to Elite Session Generator!"
+        value: 10000
+      - key: NODE_ENV
+        value: production
