@@ -1,7 +1,7 @@
 {
   "name": "mastertech-md-session",
   "version": "1.0.0",
-  "description": "WhatsApp Session Generator for MASTERTECH-MD",
+  "description": "WhatsApp Session Generator for MASTERTECH-XD",
   "main": "src/elite.js",
   "scripts": {
     "start": "node src/elite.js",
