@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MASTERTECH-MD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@500;700&display=swap">
+  <style>
+    :root {
+      --neon-green: #0ff;
+      --neon-blue: #08f;
+      --neon-purple: #80f;
+      --neon-pink: #f0f;
+      --neon-yellow: #ff0;
+      --dark-bg: #0a0a12;
+      --darker-bg: #050508;
+    }
+    
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Video background container */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
+    }
+    
+    .video-background video {
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      opacity: 0.3;
+      filter: brightness(0.5) contrast(1.2);
+    }
+    
+    /* Overlay to blend with dark theme */
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(5,5,8,0.9) 0%, rgba(10,10,18,0.8) 100%);
+      z-index: -1;
+    }
+    
+    .title {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+      margin-bottom: 1rem;
+      letter-spacing: 3px;
+      animation: pulse 2s infinite alternate;
+      position: relative;
+      padding: 0 20px;
+      text-align: center;
+      z-index: 1;
+    }
+    
+    .title::before, .title::after {
+      content: '✦';
+      position: absolute;
+      color: var(--neon-pink);
+      font-size: 1.5rem;
+      animation: spin 4s linear infinite;
+    }
+    
+    .title::before {
+      left: -10px;
+    }
+    
+    .title::after {
+      right: -10px;
+    }
+    
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 1rem;
+      max-width: 900px;
+      width: 90%;
+      z-index: 1;
+    }
+    
+    .btn {
+      position: relative;
+      padding: 1.2em 2em;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      z-index: 1;
+      min-width: 220px;
+      backdrop-filter: blur(5px);
+    }
+    
+    /* Music player section */
+    .music-player {
+      width: 90%;
+      max-width: 600px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      z-index: 1;
+    }
+    
+    .music-player h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-blue);
+      text-shadow: 0 0 8px var(--neon-blue);
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    
+    .track-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .track-item {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      background: rgba(10, 10, 25, 0.5);
+      border-radius: 6px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+    
+    .track-item:hover {
+      background: rgba(20, 20, 40, 0.7);
+      border-left: 3px solid var(--neon-green);
+      transform: translateX(5px);
+    }
+    
+    .track-number {
+      color: var(--neon-pink);
+      font-family: 'Orbitron', sans-serif;
+      margin-right: 1rem;
+      width: 2rem;
+      text-align: center;
+      text-shadow: 0 0 5px var(--neon-pink);
+    }
+    
+    .track-link {
+      color: white;
+      text-decoration: none;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    
+    .track-link:hover {
+      color: var(--neon-green);
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+    
+    .track-icon {
+      margin-right: 0.8rem;
+      font-size: 1.2rem;
+    }
+    
+    .now-playing {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(0, 20, 30, 0.6);
+      border-radius: 8px;
+      border: 1px solid var(--neon-blue);
+      text-align: center;
+    }
+    
+    .now-playing.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    
+    .now-playing-title {
+      color: var(--neon-green);
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 0.5rem;
+    }
+    
+    audio {
+      width: 100%;
+      margin-top: 0.5rem;
+      filter: drop-shadow(0 0 5px var(--neon-blue));
+    }
+    
+    audio::-webkit-media-controls-panel {
+      background: linear-gradient(to right, #0a0a20, #0a1a2a);
+      border-radius: 0;
+    }
+    
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-mute-button {
+      background-color: var(--neon-blue);
+      border-radius: 50%;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Rest of your existing styles... */
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+      z-index: -1;
+    }
+    
+    .btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 25px rgba(0, 255, 255, 0.6);
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 15px rgba(0, 255, 255, 0.4);
+    }
+    
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      border-radius: 2px;
+      background: linear-gradient(45deg, #0a0a12, #111122);
+      z-index: -2;
+    }
+    
+    /* Unique colors for each button */
+    .btn:nth-child(1) { --accent: var(--neon-green); }
+    .btn:nth-child(2) { --accent: var(--neon-blue); }
+    .btn:nth-child(3) { --accent: var(--neon-purple); }
+    .btn:nth-child(4) { --accent: var(--neon-yellow); }
+    .btn:nth-child(5) { --accent: var(--neon-pink); }
+    .btn:nth-child(6) { --accent: #f80; }
+    .btn:nth-child(7) { --accent: #0f0; }
+    .btn:nth-child(8) { --accent: #f08; }
+    
+    .btn:hover {
+      box-shadow: 0 0 25px var(--accent);
+    }
+    
+    .btn:hover::before {
+      background: linear-gradient(90deg, transparent, rgba(var(--accent), 0.2), transparent);
+    }
+    
+    .btn-text {
+      position: relative;
+      z-index: 1;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn:hover .btn-text {
+      color: var(--accent);
+      text-shadow: 0 0 8px var(--accent);
+    }
+    
+    .btn-icon {
+      font-size: 1.2em;
+    }
+    
+    .glow-effect {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      background: radial-gradient(circle at center, var(--accent) 0%, transparent 70%);
+      transition: 0.5s;
+      z-index: -1;
+    }
+    
+    .btn:hover .glow-effect {
+      opacity: 0.3;
+    }
+    
+    .corner {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: 0.3s;
+    }
+    
+    .top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
+    .top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
+    .bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+    .bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+    
+    .btn:hover .corner {
+      width: 15px;
+      height: 15px;
+      border-color: var(--accent);
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      background: var(--neon-green);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: float linear infinite;
+      filter: blur(1px);
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
+      100% { transform: translateY(-100px) translateX(100px) rotate(360deg); }
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .btn-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+      }
+      
+      .title::before, .title::after {
+        font-size: 1rem;
+      }
+      
+      .video-background {
+        display: none;
+      }
+      
+      body {
+        background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+      }
+      
+      .music-player {
+        padding: 1rem;
+      }
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      padding: 1rem;
+      z-index: 1;
+    }
+    
+    .footer a {
+      color: var(--neon-green);
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    
+    .footer a:hover {
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+  </style>
+</head>
+<body>
+  <!-- Video Background -->
+  <div class="video-background">
+    <video autoplay muted loop>
+      <source src="https://assets.vecteezy.com/system/resources/previews/027/096/967/mp4/futuristic-technology-digital-holographic-element-laser-glow-effect-arrow-blue-laser-and-two-callout-border-with-numeric-blue-tone.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-overlay"></div>
+  
+  <h1 class="title">⚡MASTERTECH-MD S3SSIONS⚡</h1>
+  
+  <div class="btn-grid">
+    <button onclick="window.open('/qr')" class="btn">
+      <span class="btn-text"><span class="btn-icon">🔲</span> QR Code</span>
+      <div class="glow-effect"></div>
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </button>
+    
+    <button onclick="window.open('/pair')" class="btn">
+      <span class="btn-text"><span class="btn-icon">🔗</span> Pair Code</span>
+      <div class="glow-effect"></div>
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </button>
+    
+    <button onclick="window.open('https://github.com/Mastertech-XD/mastertech')" class="btn">
+      <span class="btn-text"><span class="btn-icon">🤖</span> Bot Repo</span>
+      <div class="glow-effect"></div>
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </button>
+    
+    <button onclick="window.open('https://github.com/Mastertech-XD/mastertech')" class="btn">
+      <span class="btn-text"><span class="btn-icon">🧩</span> Plugins</span>
+      <div class="glow-effect"></div>
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </button>
+    
+    <button onclick="window.open('https://wa.me/254743727510')" class="btn">
+      <span class="btn-text"><span class="btn-icon">👨‍💻</span> Contact Me</span>
+      <div class="glow-effect"></div>
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </button>
+  </div>
+  
+  <!-- Music Player Section -->
+  <div class="music-player">
+    <h2>SOUNDTRACKS</h2>
+    <ul class="track-list">
+      <li class="track-item" data-src="https://files.catbox.moe/utbujd.mp3">
+        <span class="track-number">01</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 1: utbujd.mp3', 'https://files.catbox.moe/utbujd.mp3')">
+          <span class="track-icon">🎵</span>
+          <span>utbujd.mp3</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/w2j17k.m4a">
+        <span class="track-number">02</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 2: w2j17k.m4a', 'https://files.catbox.moe/w2j17k.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>w2j17k.m4a</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/851skv.m4a">
+        <span class="track-number">03</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 3: 851skv.m4a', 'https://files.catbox.moe/851skv.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>851skv.m4a</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/qnhtbu.m4a">
+        <span class="track-number">04</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 4: qnhtbu.m4a', 'https://files.catbox.moe/qnhtbu.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>qnhtbu.m4a</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/lb0x7w.mp3">
+        <span class="track-number">05</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 5: lb0x7w.mp3', 'https://files.catbox.moe/lb0x7w.mp3')">
+          <span class="track-icon">🎵</span>
+          <span>lb0x7w.mp3</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/utbujd.mp3">
+        <span class="track-number">06</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 6: tbujd.mp3', 'https://files.catbox.moe/utbujd.mp3')">
+          <span class="track-icon">🎵</span>
+          <span>tbujd.mp3</span>
+        </a>
+      </li>
+      <li class="track-item" data-src="https://files.catbox.moe/w2j17k.m4a">
+        <span class="track-number">07</span>
+        <a href="#" class="track-link" onclick="playTrack(event, 'Track 6: w2j17k.m4a', 'https://files.catbox.moe/w2j17k.m4a')">
+          <span class="track-icon">🎵</span>
+          <span>w2j17k.m4a</span>
+        </a>
+      </li>
+    </ul>
+    
+    <div class="now-playing" id="nowPlaying">
+      <div class="now-playing-title" id="nowPlayingTitle"></div>
+      <audio controls id="audioPlayer">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
+  
+  <div class="particles" id="particles-js"></div>
+  
+  <div class="footer">
+    Powered by <a href="https://github.com/Mastertech-XD/mastertech" target="_blank">MASTERPEACE ELITE</a> | © 2025 All Rights Reserved
+  </div>
+  
+  <script>
+    // Create floating particles
+    document.addEventListener('DOMContentLoaded', function() {
+      const particlesContainer = document.getElementById('particles-js');
+      const colors = ['#0ff', '#08f', '#80f', '#f0f', '#ff0', '#f80'];
+      
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        const size = Math.random() * 4 + 1;
+        const posX = Math.random() * window.innerWidth;
+        const posY = Math.random() * window.innerHeight + window.innerHeight;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 10;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}px`;
+        particle.style.top = `${posY}px`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${delay}s`;
+        particle.style.background = color;
+        
+        particlesContainer.appendChild(particle);
+      }
+      
+      // Add sound effect on button hover
+      const buttons = document.querySelectorAll('.btn');
+      const hoverSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3');
+      hoverSound.volume = 0.2;
+      
+      buttons.forEach(button => {
+        button.addEventListener('mouseenter', () => {
+          hoverSound.currentTime = 0;
+          hoverSound.play().catch(e => console.log("Audio play prevented:", e));
+        });
+      });
+      
+      // Ensure video plays on mobile when autoplay is blocked
+      const video = document.querySelector('.video-background video');
+      const playVideo = () => {
+        video.play().catch(e => {
+          console.log("Video autoplay prevented, trying with muted");
+          video.muted = true;
+          video.play();
+        });
+      };
+      
+      // Try to play video after user interaction
+      document.body.addEventListener('click', () => {
+        playVideo();
+      }, { once: true });
+      
+      // Fallback if video can't load
+      video.addEventListener('error', () => {
+        console.log("Video failed to load, using fallback background");
+        document.querySelector('.video-background').style.display = 'none';
+      });
+    });
+    
+    // Music player functionality
+    function playTrack(event, title, src) {
+      event.preventDefault();
+      
+      const audioPlayer = document.getElementById('audioPlayer');
+      const nowPlaying = document.getElementById('nowPlaying');
+      const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+      
+      // Update the player
+      nowPlayingTitle.textContent = title;
+      audioPlayer.src = src;
+      nowPlaying.classList.add('active');
+      
+      // Play the track
+      audioPlayer.play().catch(e => {
+        console.log("Audio play prevented:", e);
+        // Show a message if autoplay is blocked
+        nowPlayingTitle.textContent = "Click the play button to start";
+      });
+      
+      // Highlight the playing track
+      document.querySelectorAll('.track-item').forEach(item => {
+        item.style.borderLeft = item.dataset.src === src ? '3px solid var(--neon-green)' : '3px solid transparent';
+      });
+    }
+  </script>
+</body>
+</html>
