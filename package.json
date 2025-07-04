@@ -2,10 +2,10 @@
   "name": "mastertech-md-session",
   "version": "1.0.0",
   "description": "WhatsApp Session Generator for MASTERTECH-MD",
-  "main": "elite.js",
+  "main": "src/elite.js",
   "scripts": {
-    "start": "node elite.js",
-    "dev": "nodemon elite.js",
+    "start": "node src/elite.js",
+    "dev": "nodemon src/elite.js",
     "build": "npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,9 +22,5 @@
     "axios": "1.6.2",
     "fs-extra": "11.2.0",
     "path": "0.12.7"
-  },
-  "peerDependencies": {
-    "eslint": "^8.6.0",
-    "typescript": "^4.8.4"
   }
 }
