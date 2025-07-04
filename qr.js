@@ -13,158 +13,109 @@ const {
     jidNormalizedUser
 } = require("@whiskeysockets/baileys");
 const { upload } = require('./mega');
+
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
     fs.rmSync(FilePath, { recursive: true, force: true });
 }
+
 router.get('/', async (req, res) => {
     const id = makeid();
- //   let num = req.query.number;
-    async function MASTERTECH_XD_PAIR_CODE() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/' + id);
+    
+    async function MASTERTECH_XD_QR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
         try {
-var items = ["Safari"];
-function selectRandomItem(array) {
-  var randomIndex = Math.floor(Math.random() * array.length);
-  return array[randomIndex];
-}
-var randomItem = selectRandomItem(items);
-            
             let sock = makeWASocket({
-                	
-				auth: state,
-				printQRInTerminal: false,
-				logger: pino({
-					level: "silent"
-				}),
-				browser: Browsers.macOS("Desktop"),
-			});
+                auth: state,
+                printQRInTerminal: false,
+                logger: pino({ level: "silent" }),
+                browser: Browsers.macOS("Desktop")
+            });
             
             sock.ev.on('creds.update', saveCreds);
             sock.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect,
-                    qr
-                } = s;
-              if (qr) await res.end(await QRCode.toBuffer(qr));
-                if (connection == "open") {
-                    await delay(5000);
-                    let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                    let rf = __dirname + `/temp/${id}/creds.json`;
-                    function generateRandomText() {
-                        const prefix = "3EB";
-                        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                        let randomText = prefix;
-                        for (let i = prefix.length; i < 22; i++) {
-                            const randomIndex = Math.floor(Math.random() * characters.length);
-                            randomText += characters.charAt(randomIndex);
-                        }
-                        return randomText;
+                const { connection, lastDisconnect, qr } = s;
+                
+                if (qr) {
+                    const qrImage = await QRCode.toBuffer(qr);
+                    if (!res.headersSent) {
+                        res.writeHead(200, {
+                            'Content-Type': 'image/png',
+                            'Content-Length': qrImage.length
+                        });
+                        res.end(qrImage);
                     }
-                    const randomText = generateRandomText();
+                }
+
+                if (connection == "open") {
+                    await delay(3000);
+                    let rf = __dirname + `/temp/${id}/creds.json`;
+                    
                     try {
-                        const { upload } = require('./mega');
                         const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
                         const string_session = mega_url.replace('https://mega.nz/file/', '');
                         let md = "mastertech~" + string_session;
-                        let code = await sock.sendMessage(sock.user.id, { text: md });
-                        let desc = `*Hey there, MASTERTECH-XD User!* 👋🏻
+                        
+                        const welcomeMsg = `
+✨ *𝗠𝗔𝗦𝗧𝗘𝗥𝗧𝗘𝗖𝗛-𝗫𝗗 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘𝗗!* ✨
 
-Thanks for using *MASTERTECH-XD* — your session has been successfully created!
+┏━━━━━━━━━━━━━━━━━━━┓
+┃  🎉 𝗪𝗘𝗟𝗖𝗢𝗠𝗘 𝗔𝗕𝗢𝗔𝗥𝗗!  
+┗━━━━━━━━━━━━━━━━━━━┛
 
-🔐 *Session ID:* Sent above  
-⚠️ *Keep it safe!* Do NOT share this ID with anyone.
+📛 *Bot ID:* ${sock.user.id.replace(/:\d+@/, '@')}
+📊 *Platform:* ${sock.user.platform || 'Unknown'}
 
-——————
+┏━━━━━━━━━━━━━━━━━━━┓
+┃  🔐 𝗦𝗘𝗦𝗦𝗜𝗢𝗡 𝗗𝗨𝗖𝗖𝗘𝗦𝗦  
+┗━━━━━━━━━━━━━━━━━━━┛
 
-*✅ Stay Updated:*  
-Join our official WhatsApp Channel:  
-https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
+Your session credentials are now securely stored.
+Keep this information safe and private.
 
-*💻 Source Code:*  
-Fork & explore the project on GitHub:  
-https://github.com/XdKing2/MASTERTECH-XD
+👑 *Developer:* MASTERPEACE ELITE
+💎 *Version:* 2.0 Elite Edition
+`;
 
-——————
+                        await sock.sendMessage(sock.user.id, { 
+                            text: welcomeMsg,
+                            contextInfo: {
+                                externalAdReply: {
+                                    title: "MASTERTECH-XD READY",
+                                    body: "Premium WhatsApp Bot Solution",
+                                    thumbnailUrl: "https://i.imgur.com/xyz1234.jpg",
+                                    sourceUrl: "https://github.com/MASTERPEACE-ELITE",
+                                    mediaType: 1
+                                }
+                            }
+                        });
 
-> *© Powered by MASTERPEACE ELITE*
-Stay cool and hack smart. ✌🏻`;
-                        await sock.sendMessage(sock.user.id, {
-text: desc,
-contextInfo: {
-externalAdReply: {
-title: "ᴍᴀsᴛᴇʀᴛᴇᴄʜ-xᴅ 𝕮𝖔𝖓𝖓𝖊𝖈𝖙𝖊𝖉",
-thumbnailUrl: "https://files.catbox.moe/bqs70b.jpg",
-sourceUrl: "https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A",
-mediaType: 1,
-renderLargerThumbnail: true
-}  
-}
-},
-{quoted:code })
+                        await sock.sendMessage(sock.user.id, { text: md });
+
                     } catch (e) {
-                            let ddd = sock.sendMessage(sock.user.id, { text: e });
-                            let desc = `*Hey there, MASTERTECH-XD User!* 👋🏻
-
-Thanks for using *MASTERTECH-XD* — your session has been successfully created!
-
-🔐 *Session ID:* Sent above  
-⚠️ *Keep it safe!* Do NOT share this ID with anyone.
-
-——————
-
-*✅ Stay Updated:*  
-Join our official WhatsApp Channel:  
-https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
-
-*💻 Source Code:*  
-Fork & explore the project on GitHub:  
-https://github.com/XdKing2/MASTERTECH-XD
-
-> *© Powered by MASTERPEACE ELITE*
-Stay cool and hack smart. ✌🏻*`;
-                            await sock.sendMessage(sock.user.id, {
-text: desc,
-contextInfo: {
-externalAdReply: {
-title: "ᴍᴀsᴛᴇʀᴛᴇᴄʜ-xᴅ 𝕮𝖔𝖓𝖓𝖊𝖈𝖙𝖊𝖉 ✅  ",
-thumbnailUrl: "https://files.catbox.moe/bqs70b.jpg",
-sourceUrl: "https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A",
-mediaType: 2,
-renderLargerThumbnail: true,
-showAdAttribution: true
-}  
-}
-},
-{quoted:ddd })
+                        console.error("Error:", e);
+                        await sock.sendMessage(sock.user.id, { text: `❌ Error: ${e.message}` });
                     }
-                    await delay(10);
+
+                    await delay(100);
                     await sock.ws.close();
                     await removeFile('./temp/' + id);
-                    console.log(`👤 ${sock.user.id} 𝗖𝗼𝗻𝗻𝗲𝗰𝘁𝗲𝗱 ✅ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...`);
-                    await delay(10);
+                    console.log(`✅ Session for ${sock.user.id} completed successfully`);
                     process.exit();
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10);
-                    MASTERTECH_XD_PAIR_CODE();
+                } else if (connection === "close" && lastDisconnect?.error?.output?.statusCode !== 401) {
+                    await delay(1000);
+                    MASTERTECH_XD_QR_CODE();
                 }
             });
         } catch (err) {
-            console.log("service restated");
+            console.error("Error:", err);
             await removeFile('./temp/' + id);
             if (!res.headersSent) {
-                await res.send({ code: "❗ Service Unavailable" });
+                res.status(500).send("❗ Service Error");
             }
         }
     }
-    await MASTERTECH_XD_PAIR_CODE();
+    await MASTERTECH_XD_QR_CODE();
 });
-setInterval(() => {
-    console.log("☘️ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...");
-    process.exit();
-}, 180000); //30min
+
 module.exports = router;
