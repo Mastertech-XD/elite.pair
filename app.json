@@ -1,22 +1,39 @@
 {
-    "name": "Session code Generator",
-    "description": "I'm Web Session Generator by Elite-XD",
-    "logo": "",
-    "repository": "https://github.com/Mastertech-XD/elite.pair/",
-    "keywords": ["@Xcelsama"],
-    "success_url": "/", 
-    "buildpacks": [{ "url": "https://github.com/heroku/heroku-buildpack-nodejs#latest" } ],
-    "env": {      
-      "PORT": {
-        "description": "Port for web app.4000,5000,3000... any!",
-        "value": "5000",
-        "required": false 
-      },
-      "MESSAGE": {
-        "description": "",
-        "value": "",
-        "required": false 
-      }
-    }   
-
+  "name": "MASTERTECH-XD Session Generator",
+  "description": "Professional WhatsApp Session Generator by MASTERTECH-XD",
+  "logo": "https://i.imgur.com/GVW7aoD.jpeg",
+  "repository": "https://github.com/MASTERTECH-XD/elite.pair",
+  "keywords": [
+    "MASTERTECH-XD",
+    "Mastertech",
+    "WhatsApp-Session",
+    "WhatsApp-Bot",
+    "Baileys",
+    "NodeJS"
+  ],
+  "success_url": "/",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "PORT": {
+      "description": "Port for web application (5000 recommended)",
+      "value": "5000",
+      "required": true
+    },
+    "MEGA_EMAIL": {
+      "description": "MEGA.nz account email for session storage",
+      "required": true
+    },
+    "MEGA_PASSWORD": {
+      "description": "MEGA.nz account password",
+      "required": true
+    },
+    "ADMIN_NUMBER": {
+      "description": "Your WhatsApp number with country code",
+      "required": false
+    }
+  }
 }
