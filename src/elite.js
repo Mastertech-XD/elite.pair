@@ -3,12 +3,8 @@ const app = express();
 const path = require('path');
 const bodyParser = require("body-parser");
 
-// Import routers
-const qrRouter = require('./qr');
-const pairRouter = require('./pair');
-
 // Configuration
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 const __path = process.cwd();
 
 // Middleware
@@ -16,21 +12,30 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__path, 'public')));
 
+// Import routers
+const qrRouter = require('./src/qr');
+const pairRouter = require('./src/pair');
+
 // Routes
 app.use('/server', qrRouter);
 app.use('/code', pairRouter);
 
 // HTML routes
 app.get('/pair', (req, res) => {
-    res.sendFile(path.join(__path, 'pair.html'));
+    res.sendFile(path.join(__path, 'public/pair.html'));
 });
 
 app.get('/qr', (req, res) => {
-    res.sendFile(path.join(__path, 'qr.html'));
+    res.sendFile(path.join(__path, 'public/qr.html'));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__path, 'index.html'));
+    res.sendFile(path.join(__path, 'public/index.html'));
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
 });
 
 // Error handling
@@ -44,10 +49,9 @@ app.listen(PORT, () => {
 ╔══════════════════════╗
   MASTERTECH-MD RUNNING
 ╚══════════════════════╝
-➤ Server running on http://localhost:${PORT}
+➤ Server running on port ${PORT}
 ➤ Pair Code: /pair
 ➤ QR Code: /qr
+➤ Health Check: /health
 `);
 });
-
-module.exports = app;
